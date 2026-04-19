@@ -34,6 +34,47 @@ const fdt = d => d ? fd(d) + " " + new Date(d).toLocaleTimeString("sr-RS", { hou
 const fm = n => new Intl.NumberFormat("sr-RS").format(n || 0) + " RSD";
 const tdy = () => new Date().toISOString().slice(0, 10);
 const dk = d => new Date(d).toISOString().slice(0, 10);
+
+// Phone formatting — Viber needs +381XXXXXXXXX (no spaces), tel: needs raw number
+const fmtPhoneIntl = (p) => {
+  if (!p) return "";
+  let c = String(p).replace(/[\s\-\(\)]/g, "");
+  if (c.startsWith("+381")) return c;
+  if (c.startsWith("00381")) return "+" + c.slice(2);
+  if (c.startsWith("0")) return "+381" + c.slice(1);
+  return "+381" + c;
+};
+const fmtPhoneForTel = (p) => fmtPhoneIntl(p);
+const fmtPhoneForViber = (p) => fmtPhoneIntl(p); // viber://chat?number= needs +381...
+
+// PostExpress tracking URL
+const trackUrl = (px) => `https://posta.rs/alati/pracenje-posiljaka.aspx?code=${encodeURIComponent(px || "")}`;
+
+// Notification helpers
+const notifSupported = () => typeof window !== "undefined" && "Notification" in window;
+const notifPermission = () => notifSupported() ? Notification.permission : "denied";
+async function requestNotifPerm() {
+  if (!notifSupported()) return "denied";
+  if (Notification.permission === "granted") return "granted";
+  if (Notification.permission === "denied") return "denied";
+  try { return await Notification.requestPermission(); } catch { return "denied"; }
+}
+function showNotif(title, body, tag, onClick) {
+  if (!notifSupported() || Notification.permission !== "granted") return;
+  try {
+    const n = new Notification(title, { body, tag, icon: "/icon-192.png", badge: "/icon-192.png", requireInteraction: false });
+    if (onClick) n.onclick = () => { window.focus(); onClick(); n.close(); };
+  } catch (e) { console.error("Notif error:", e); }
+}
+
+// Track which urgent orders already notified (localStorage, per-day)
+const NOTIF_KEY = "ecom-notified-urgent";
+function getNotified() {
+  try { return JSON.parse(localStorage.getItem(NOTIF_KEY) || "{}"); } catch { return {}; }
+}
+function setNotified(obj) {
+  try { localStorage.setItem(NOTIF_KEY, JSON.stringify(obj)); } catch {}
+}
 const PER_PAGE = 15;
 
 const SK = "ecom-v1";
@@ -118,9 +159,37 @@ function Pager({ page, total, setPage }) {
 }
 
 function Login({ onLogin }) {
-  const [u, setU] = useState(""); const [p, setP] = useState(""); const [err, setErr] = useState(""); const [sh, setSh] = useState(false);
-  const go = () => { const user = USERS.find(x => x.username === u && x.password === p); if (user) onLogin(user); else { setErr("Pogrešno ime ili lozinka"); setTimeout(() => setErr(""), 3e3); } };
-  return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: F }}><div style={{ width: "100%", maxWidth: 340 }}><div style={{ textAlign: "center", marginBottom: 36 }}><div style={{ fontSize: 44, fontWeight: 900, background: `linear-gradient(135deg,${C.accent},#ef4444)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>👟 eCom</div><div style={{ fontSize: 12, color: C.dim, marginTop: 4, letterSpacing: 3, textTransform: "uppercase" }}>Tracking System</div></div><div style={{ ...S.card, padding: 22 }}><Fl label="Korisničko ime"><input style={S.inp} value={u} onChange={e => setU(e.target.value)} placeholder="Ime..." onKeyDown={e => e.key === "Enter" && go()} /></Fl><Fl label="Lozinka"><div style={{ position: "relative" }}><input style={S.inp} type={sh ? "text" : "password"} value={p} onChange={e => setP(e.target.value)} placeholder="Lozinka..." onKeyDown={e => e.key === "Enter" && go()} /><button onClick={() => setSh(!sh)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: C.dim, cursor: "pointer", fontSize: 11, fontFamily: F }}>{sh ? "Sakrij" : "Prikaži"}</button></div></Fl>{err && <div style={{ color: C.danger, fontSize: 13, marginBottom: 10, textAlign: "center" }}>{err}</div>}<button onClick={go} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 15 }}>Prijavi se</button></div></div></div>;
+  const [u, setU] = useState(() => { try { return localStorage.getItem("ecom-rem-u") || ""; } catch { return ""; } });
+  const [p, setP] = useState(() => { try { return localStorage.getItem("ecom-rem-p") || ""; } catch { return ""; } });
+  const [err, setErr] = useState(""); const [sh, setSh] = useState(false);
+  const [remember, setRemember] = useState(() => { try { return !!localStorage.getItem("ecom-rem-u"); } catch { return false; } });
+  const go = () => {
+    const user = USERS.find(x => x.username === u && x.password === p);
+    if (user) {
+      try {
+        if (remember) { localStorage.setItem("ecom-rem-u", u); localStorage.setItem("ecom-rem-p", p); }
+        else { localStorage.removeItem("ecom-rem-u"); localStorage.removeItem("ecom-rem-p"); }
+      } catch {}
+      onLogin(user);
+    } else { setErr("Pogrešno ime ili lozinka"); setTimeout(() => setErr(""), 3e3); }
+  };
+  // Auto-login if credentials saved
+  useEffect(() => {
+    try {
+      const su = localStorage.getItem("ecom-rem-u");
+      const sp = localStorage.getItem("ecom-rem-p");
+      if (su && sp) {
+        const user = USERS.find(x => x.username === su && x.password === sp);
+        if (user) onLogin(user);
+      }
+    } catch {}
+  }, []);
+  return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: F }}><div style={{ width: "100%", maxWidth: 340 }}><div style={{ textAlign: "center", marginBottom: 36 }}><div style={{ fontSize: 44, fontWeight: 900, background: `linear-gradient(135deg,${C.accent},#ef4444)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>👟 eCom</div><div style={{ fontSize: 12, color: C.dim, marginTop: 4, letterSpacing: 3, textTransform: "uppercase" }}>Tracking System</div></div><div style={{ ...S.card, padding: 22 }}><Fl label="Korisničko ime"><input style={S.inp} value={u} onChange={e => setU(e.target.value)} placeholder="Ime..." onKeyDown={e => e.key === "Enter" && go()} /></Fl><Fl label="Lozinka"><div style={{ position: "relative" }}><input style={S.inp} type={sh ? "text" : "password"} value={p} onChange={e => setP(e.target.value)} placeholder="Lozinka..." onKeyDown={e => e.key === "Enter" && go()} /><button onClick={() => setSh(!sh)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: C.dim, cursor: "pointer", fontSize: 11, fontFamily: F }}>{sh ? "Sakrij" : "Prikaži"}</button></div></Fl>
+    <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", marginBottom: 14, padding: "6px 4px" }}>
+      <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} style={{ width: 18, height: 18, accentColor: C.accent, cursor: "pointer" }} />
+      <span style={{ fontSize: 13, color: C.dim }}>Zapamti me na ovom uređaju</span>
+    </label>
+    {err && <div style={{ color: C.danger, fontSize: 13, marginBottom: 10, textAlign: "center" }}>{err}</div>}<button onClick={go} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 15 }}>Prijavi se</button></div></div></div>;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -396,7 +465,7 @@ function OrdersPage({ data, setData, user, log }) {
                   <div><span style={{ color: C.dim }}>Mesto:</span> {o.city || "—"}</div>
                   <div style={{ gridColumn: "1/-1" }}><span style={{ color: C.dim }}>Adresa:</span> {o.address || "—"}</div>
                   <div><span style={{ color: C.dim }}>ID:</span> <span style={{ color: C.purple, fontWeight: 600 }}>{o.idBroj || "—"}</span></div>
-                  <div><span style={{ color: C.dim }}>PX:</span> <span style={{ color: C.accent, fontWeight: 600 }}>{o.pxBroj || "—"}</span></div>
+                  <div><span style={{ color: C.dim }}>PX:</span> {o.pxBroj ? <a href={trackUrl(o.pxBroj)} target="_blank" rel="noopener noreferrer" style={{ color: C.accent, fontWeight: 600, textDecoration: "underline", textDecorationStyle: "dotted" }} onClick={e => e.stopPropagation()}>{o.pxBroj}</a> : <span style={{ color: C.dim }}>—</span>}</div>
                   {o.dateDelivered && <div><span style={{ color: C.dim }}>Isporučeno:</span> {fd(o.dateDelivered)}</div>}
                   {o.status === "odbijeno" && <div><span style={{ color: C.dim }}>Retur:</span> <span style={{ color: C.danger }}>{fm(o.returPostarina)}</span></div>}
                   {o.note && <div style={{ gridColumn: "1/-1" }}><span style={{ color: C.dim }}>Napomena:</span> {o.note}</div>}
@@ -980,6 +1049,7 @@ function EditOrderModal({ order, data, setData, log, onClose }) {
 // ═══════════════════════════════════════════════════════════════
 function UrgentnoPage({ data, setData, user, log, goBack }) {
   const [expanded, setExpanded] = useState(null);
+  const [notifPerm, setNotifPerm] = useState(() => notifPermission());
   const now = Date.now();
   const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
 
@@ -1005,9 +1075,38 @@ function UrgentnoPage({ data, setData, user, log, goBack }) {
     setData(nd); sv(nd);
   };
 
+  const enableNotif = async () => {
+    const result = await requestNotifPerm();
+    setNotifPerm(result);
+    if (result === "granted") {
+      showNotif("✅ Notifikacije uključene", "Dobijaćeš obaveštenje za urgentne porudžbine.", "test");
+    }
+  };
+
   return (
     <div style={{ padding: "14px 14px 20px" }}>
       <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Nazad</button>
+
+      {/* Notif permission bar */}
+      {notifSupported() && notifPerm !== "granted" && (
+        <div style={{ ...S.card, background: notifPerm === "denied" ? C.dangerBg : C.infoBg, borderColor: notifPerm === "denied" ? C.danger + "44" : C.info + "44", padding: 14 }}>
+          {notifPerm === "denied" ? (
+            <>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.danger, marginBottom: 6 }}>🔕 Notifikacije blokirane</div>
+              <div style={{ fontSize: 12, color: C.dim, lineHeight: 1.5 }}>Notifikacije su blokirane u browseru. Da ih uključiš: klikni katanac/info ikonu levo od adrese sajta → Notifications → Allow.</div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>🔔 Uključi notifikacije</div>
+              <div style={{ fontSize: 12, color: C.dim, marginBottom: 10, lineHeight: 1.5 }}>Dobijaj obaveštenje čim se neka porudžbina ne isporuči u roku od 3 dana.</div>
+              <button onClick={enableNotif} style={{ ...S.btn, padding: "9px 16px", fontSize: 13, width: "100%" }}>🔔 Uključi notifikacije</button>
+            </>
+          )}
+        </div>
+      )}
+      {notifSupported() && notifPerm === "granted" && (
+        <div style={{ fontSize: 11, color: C.success, textAlign: "center", marginBottom: 10 }}>🔔 Notifikacije su aktivne</div>
+      )}
 
       <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, border: `1px solid ${C.danger}33`, background: C.dangerBg, borderRadius: 14, padding: 14 }}>
         <div style={{ ...S.stL, color: C.danger }}>⚠️ URGENTNO — više od 3 dana bez isporuke</div>
@@ -1038,15 +1137,17 @@ function UrgentnoPage({ data, setData, user, log, goBack }) {
             {exp && (
               <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12, marginBottom: 12 }}>
-                  <div><span style={{ color: C.dim }}>Telefon:</span> <a href={`tel:${o.phone}`} style={{ color: C.accent, fontWeight: 700, textDecoration: "none" }}>{o.phone || "—"}</a></div>
+                  <div><span style={{ color: C.dim }}>Telefon:</span> <a href={`tel:${fmtPhoneForTel(o.phone)}`} style={{ color: C.accent, fontWeight: 700, textDecoration: "none" }}>{o.phone || "—"}</a></div>
                   <div><span style={{ color: C.dim }}>Mesto:</span> {o.city || "—"}</div>
                   <div style={{ gridColumn: "1/-1" }}><span style={{ color: C.dim }}>Adresa:</span> {o.address || "—"}</div>
                   <div><span style={{ color: C.dim }}>Iznos:</span> <span style={{ color: C.accent, fontWeight: 700, fontFamily: FM }}>{fm(o.codAmount)}</span></div>
                   <div><span style={{ color: C.dim }}>PX dobijen:</span> {fd(o.datePx || o.dateCreated)}</div>
                 </div>
-                <div style={{ display: "flex", gap: 6 }}>
-                  {o.phone && <a href={`tel:${o.phone}`} style={{ ...S.btn, textDecoration: "none", flex: 1, fontSize: 13, padding: "10px" }}>📞 Pozovi</a>}
-                  <button onClick={() => markCalled(o)} style={{ ...S.btn2, flex: 1, fontSize: 13, color: C.success, borderColor: C.success + "44" }}>✅ Pozvan</button>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {o.phone && <a href={`tel:${fmtPhoneForTel(o.phone)}`} onClick={() => markCalled(o)} style={{ ...S.btn, textDecoration: "none", flex: "1 1 calc(50% - 3px)", fontSize: 13, padding: "10px", justifyContent: "center" }}>📞 Pozovi</a>}
+                  {o.phone && <a href={`viber://chat?number=${fmtPhoneForViber(o.phone)}`} style={{ ...S.btn2, textDecoration: "none", flex: "1 1 calc(50% - 3px)", fontSize: 13, padding: "10px", justifyContent: "center", color: "#7360f2", borderColor: "#7360f244" }}>💬 Viber</a>}
+                  {o.pxBroj && <a href={trackUrl(o.pxBroj)} target="_blank" rel="noopener noreferrer" style={{ ...S.btn2, textDecoration: "none", flex: "1 1 calc(50% - 3px)", fontSize: 13, padding: "10px", justifyContent: "center", color: C.accent, borderColor: C.accent + "44" }}>📦 Prati PX</a>}
+                  <button onClick={() => markCalled(o)} style={{ ...S.btn2, flex: "1 1 calc(50% - 3px)", fontSize: 13, color: C.success, borderColor: C.success + "44", padding: "10px", justifyContent: "center" }}>✅ Pozvan</button>
                 </div>
               </div>
             )}
@@ -1085,6 +1186,46 @@ export default function App() {
     const iv = setInterval(() => { ld().then(d => setData(d)); }, 20000);
     return () => clearInterval(iv);
   }, [user]);
+
+  // Urgent notifications — samo za administratora
+  useEffect(() => {
+    if (!user || user.role !== "admin") return;
+    const check = () => {
+      const now = Date.now();
+      const THREE = 3 * 24 * 60 * 60 * 1000;
+      const urgent = (data.orders || []).filter(o => {
+        if (o.archived || !o.pxBroj || o.status === "isporuceno" || o.status === "odbijeno") return false;
+        if (o.calledAt) return false; // already called
+        const ref = o.datePx || o.dateCreated;
+        return ref && (now - new Date(ref).getTime()) > THREE;
+      });
+      if (urgent.length === 0) return;
+      if (notifPermission() !== "granted") return;
+      const notified = getNotified();
+      const todayKey = new Date().toISOString().slice(0, 10);
+      // Clean old days (older than 2 days)
+      Object.keys(notified).forEach(k => {
+        if (k !== todayKey && k !== new Date(Date.now() - 864e5).toISOString().slice(0, 10)) delete notified[k];
+      });
+      if (!notified[todayKey]) notified[todayKey] = {};
+      const newOnes = urgent.filter(o => !notified[todayKey][o.id]);
+      if (newOnes.length === 0) return;
+      // Single summary notification per batch
+      if (newOnes.length === 1) {
+        const o = newOnes[0];
+        const daysAgo = Math.floor((Date.now() - new Date(o.datePx || o.dateCreated).getTime()) / 864e5);
+        showNotif(`⚠️ Urgentno: ${o.name}`, `${daysAgo} dana bez isporuke • PX: ${o.pxBroj}`, "urgent-" + o.id, () => setPage("urgentno"));
+      } else {
+        showNotif(`⚠️ ${newOnes.length} urgentnih porudžbina`, `Ima više od 3 dana bez isporuke. Klikni za detalje.`, "urgent-batch", () => setPage("urgentno"));
+      }
+      newOnes.forEach(o => { notified[todayKey][o.id] = true; });
+      setNotified(notified);
+    };
+    // Check odmah + na svakih 30 min
+    const t1 = setTimeout(check, 3000);
+    const iv = setInterval(check, 30 * 60 * 1000);
+    return () => { clearTimeout(t1); clearInterval(iv); };
+  }, [user, data.orders]);
   const log = useCallback((d, action) => { d.history.unshift({ id: uid(), action, user: user?.username || "Sistem", date: new Date().toISOString() }); }, [user]);
   const handleLogin = u => { setUser(u); const nd = { ...data }; nd.history.unshift({ id: uid(), action: `${u.username} prijavljen/a`, user: u.username, date: new Date().toISOString() }); setData(nd); sv(nd); };
   if (!user) return <Login onLogin={handleLogin} />;
@@ -1117,7 +1258,7 @@ export default function App() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 11, padding: "3px 9px", borderRadius: 20, background: isA ? "rgba(239,68,68,0.15)" : C.accentBg, color: isA ? "#ef4444" : C.accent, fontWeight: 700 }}>{user.username}{isA ? " ★" : ""}</span>
-          <button onClick={() => { setUser(null); setPage("orders"); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 3 }}><Ic d={I.logout} size={17} color={C.dim} /></button>
+          <button onClick={() => { try { localStorage.removeItem("ecom-rem-u"); localStorage.removeItem("ecom-rem-p"); } catch {} setUser(null); setPage("orders"); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 3 }}><Ic d={I.logout} size={17} color={C.dim} /></button>
         </div>
       </div>
       {page === "orders" && <OrdersPage data={data} setData={setData} user={user} log={log} />}
