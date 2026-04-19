@@ -80,44 +80,117 @@ const PER_PAGE = 15;
 const SK = "ecom-v1";
 const blank = () => ({ orders: [], finances: [], inventory: [], history: [], models: [], costs: [], adSpend: [] });
 
-// Count total meaningful records - used to detect "empty overwriting rich"
-function dataSize(d) {
-  if (!d) return 0;
-  return (d.orders?.length || 0) + (d.finances?.length || 0) + (d.inventory?.length || 0) + (d.models?.length || 0) + (d.costs?.length || 0) + (d.adSpend?.length || 0);
-}
-
-async function ld() {
-  if (supabase) {
-    try {
-      const { data, error } = await supabase.from("app_state").select("data").eq("id", "main").maybeSingle();
-      if (error) { console.error("Supabase load error:", error); return blank(); }
-      return data?.data || blank();
-    } catch (e) { console.error(e); return blank(); }
+// ─── Konverzija JS ↔ DB nazivi kolona ───
+const camelToSnake = (s) => s.replace(/[A-Z]/g, l => "_" + l.toLowerCase());
+const snakeToCamel = (s) => s.replace(/_([a-z])/g, (_, l) => l.toUpperCase());
+function toDbRow(obj) {
+  const out = {};
+  for (const k in obj) {
+    if (obj[k] === undefined) continue;
+    out[camelToSnake(k)] = obj[k];
   }
-  // Fallback to localStorage when Supabase not configured
-  try { const r = localStorage.getItem(SK); return r ? JSON.parse(r) : blank(); } catch { return blank(); }
+  return out;
+}
+function fromDbRow(row) {
+  if (!row) return row;
+  const out = {};
+  for (const k in row) {
+    out[snakeToCamel(k)] = row[k];
+  }
+  return out;
 }
 
+// ─── Učitavanje svih podataka iz tabela ───
+async function ld() {
+  if (!supabase) {
+    try { const r = localStorage.getItem(SK); return r ? JSON.parse(r) : blank(); } catch { return blank(); }
+  }
+  try {
+    const [oRes, fRes, iRes, mRes, cRes, aRes, hRes] = await Promise.all([
+      supabase.from("orders").select("*").order("date_created", { ascending: false }),
+      supabase.from("finances").select("*").order("date", { ascending: false }),
+      supabase.from("inventory").select("*").order("date_added", { ascending: false }),
+      supabase.from("models").select("*").order("date_added", { ascending: false }),
+      supabase.from("costs").select("*"),
+      supabase.from("ad_spend").select("*").order("date", { ascending: false }),
+      supabase.from("history").select("*").order("date", { ascending: false }).limit(500),
+    ]);
+    return {
+      orders: (oRes.data || []).map(fromDbRow),
+      finances: (fRes.data || []).map(fromDbRow),
+      inventory: (iRes.data || []).map(fromDbRow),
+      models: (mRes.data || []).map(fromDbRow),
+      costs: (cRes.data || []).map(fromDbRow),
+      adSpend: (aRes.data || []).map(fromDbRow),
+      history: (hRes.data || []).map(fromDbRow),
+    };
+  } catch (e) { console.error("Load error:", e); return blank(); }
+}
+
+// ─── Pojedinačne operacije po entitetu ───
+// Konvencija: naziv tabele (TBL) i polje u lokalnom data objektu (KEY) se razlikuju u 2 slučaja:
+const TBL_MAP = { orders: "orders", finances: "finances", inventory: "inventory", models: "models", costs: "costs", adSpend: "ad_spend", history: "history" };
+
+async function dbUpsert(entity, row) {
+  if (!supabase) return;
+  try {
+    const { error } = await supabase.from(TBL_MAP[entity]).upsert(toDbRow(row));
+    if (error) console.error(`Upsert ${entity} error:`, error);
+  } catch (e) { console.error(e); }
+}
+
+async function dbDelete(entity, id) {
+  if (!supabase) return;
+  try {
+    const { error } = await supabase.from(TBL_MAP[entity]).delete().eq("id", id);
+    if (error) console.error(`Delete ${entity} error:`, error);
+  } catch (e) { console.error(e); }
+}
+
+// Backward-compat: sv() snima ceo state u localStorage kao fallback
 async function sv(d) {
-  if (supabase) {
-    try {
-      // CRITICAL SAFETY: Check current DB state before overwriting
-      // Prevents "empty client overwrites populated DB" scenario
-      const { data: existing } = await supabase.from("app_state").select("data").eq("id", "main").maybeSingle();
-      const existingSize = dataSize(existing?.data);
-      const newSize = dataSize(d);
-      // If DB has significantly more data than what we're trying to save, abort
-      // (allow history-only saves which might be 1-2 entries larger, but not wipes)
-      if (existingSize > 5 && newSize < existingSize - 2) {
-        console.warn(`⚠️ Prevented data loss: DB has ${existingSize} records, trying to save ${newSize}. Aborting.`);
-        alert("⚠️ Upozorenje: Otkrivena je nekonzistentnost podataka. Osvežite stranicu (F5) da dobijete najnovije podatke pre sledećeg unosa.");
-        return;
-      }
-      await supabase.from("app_state").upsert({ id: "main", data: d, updated_at: new Date().toISOString() });
-    } catch (e) { console.error("Supabase save error:", e); }
+  if (!supabase) {
+    try { localStorage.setItem(SK, JSON.stringify(d)); } catch {}
+  }
+}
+
+// ─── Generički diff sync: poredi staro i novo stanje, šalje samo promene u DB ───
+// Ovo je srce novog sistema — svako setData automatski sinhronizuje samo ono što se promenilo
+async function syncDiff(oldData, newData) {
+  if (!supabase) {
+    // localStorage fallback — samo snimi sve
+    try { localStorage.setItem(SK, JSON.stringify(newData)); } catch {}
     return;
   }
-  try { localStorage.setItem(SK, JSON.stringify(d)); } catch (e) { console.error(e); }
+  const entities = ["orders", "finances", "inventory", "models", "costs", "adSpend", "history"];
+  for (const ent of entities) {
+    const oldArr = oldData?.[ent] || [];
+    const newArr = newData?.[ent] || [];
+    const oldMap = new Map(oldArr.map(x => [x.id, x]));
+    const newMap = new Map(newArr.map(x => [x.id, x]));
+
+    // Brisani (u old a nema u new)
+    for (const [id] of oldMap) {
+      if (!newMap.has(id)) {
+        await dbDelete(ent, id);
+      }
+    }
+    // Dodati ili izmenjeni
+    for (const [id, row] of newMap) {
+      const oldRow = oldMap.get(id);
+      if (!oldRow) {
+        // Novi zapis
+        await dbUpsert(ent, row);
+      } else {
+        // Proveri da li je promenjen (plitko poređenje kroz JSON)
+        try {
+          if (JSON.stringify(oldRow) !== JSON.stringify(row)) {
+            await dbUpsert(ent, row);
+          }
+        } catch { await dbUpsert(ent, row); }
+      }
+    }
+  }
 }
 
 function copyText(text) {
@@ -1212,21 +1285,41 @@ export default function App() {
     return null;
   });
   const [page, setPage] = useState("orders");
-  const [data, setData] = useState(blank()); const [loading, setLoading] = useState(true);
+  const [data, setDataRaw] = useState(blank()); const [loading, setLoading] = useState(true);
+  // Smart setData that auto-syncs changes to DB (per-entity diff)
+  const setData = useCallback((updater) => {
+    setDataRaw(prev => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      // Fire-and-forget DB sync (non-blocking)
+      syncDiff(prev, next).catch(e => console.error("syncDiff error:", e));
+      return next;
+    });
+  }, []);
   const ww = useWW();
   const isDesktop = ww >= 900;
   useEffect(() => { ld().then(d => { setData(d); setLoading(false); }); }, []);
 
-  // Real-time sync: listen for changes from other users
+  // Real-time sync: listen for changes from other users on ALL tables
   useEffect(() => {
     if (!user || !supabase) return;
-    const ch = supabase
-      .channel("app_state_changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "app_state" }, (payload) => {
-        if (payload.new?.data) setData(payload.new.data);
-      })
+    let reloadTimer = null;
+    const scheduleReload = () => {
+      if (reloadTimer) return;
+      reloadTimer = setTimeout(() => {
+        reloadTimer = null;
+        ld().then(d => setDataRaw(d)).catch(e => console.error("Reload error:", e));
+      }, 500); // debounce — wait 500ms to batch multiple changes
+    };
+    const ch = supabase.channel("ecom-all-tables")
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "finances" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "inventory" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "models" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "costs" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "ad_spend" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "history" }, scheduleReload)
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => { if (reloadTimer) clearTimeout(reloadTimer); supabase.removeChannel(ch); };
   }, [user]);
 
   // Fallback polling when Supabase not used
