@@ -12,7 +12,7 @@ const USERS = [
   { username: "Mirela", password: "M!ReL@2026", role: "worker" },
 ];
 const ST = {
-  novo: { label: "Novo", color: "#60a5fa", bg: "rgba(96,165,250,0.15)", icon: "🆕" },
+  novo: { label: "Za unos", color: "#60a5fa", bg: "rgba(96,165,250,0.15)", icon: "🆕" },
   uneto: { label: "Uneto u sistem", color: "#a78bfa", bg: "rgba(167,139,250,0.15)", icon: "📋" },
   poslato_nedja: { label: "Poslato po Nedji", color: "#fb923c", bg: "rgba(251,146,60,0.15)", icon: "🚐" },
   poslato_kupcu: { label: "Poslato kupcu", color: "#f59e0b", bg: "rgba(245,158,11,0.15)", icon: "📦" },
@@ -402,8 +402,8 @@ function OrdersPage({ data, setData, user, log }) {
     return a;
   };
 
-  const stRow1 = [{ v: "all", l: "Sve" }, { v: "novo", l: "Novo" }, { v: "uneto", l: "Uneto" }, { v: "poslato_nedja", l: "Po Nedji" }];
-  const stRow2 = [{ v: "poslato_kupcu", l: "Kupcu" }, { v: "isporuceno", l: "Isporučeno" }, { v: "odbijeno", l: "Odbijeno" }];
+  const stRow1 = [{ v: "all", l: "Sve" }, { v: "novo", l: "Za unos" }, { v: "uneto", l: "Uneto" }, { v: "poslato_nedja", l: "Po Nedji" }];
+  const stRow2 = [{ v: "poslato_kupcu", l: "Poslato kupcu" }, { v: "isporuceno", l: "Isporučeno" }, { v: "odbijeno", l: "Odbijeno" }];
 
   return (
     <div style={{ padding: "14px 14px 20px" }}>
@@ -928,9 +928,9 @@ function ProfitPage({ data, setData, log, goBack }) {
   const [showCost, setShowCost] = useState(false); const [cm, setCm] = useState(""); const [cp, setCp] = useState("");
   const [showAd, setShowAd] = useState(false); const [ad, setAd] = useState(tdy()); const [aa, setAa] = useState("");
   const addC = () => { if (!cm || !cp) return; const nd = { ...data }; nd.costs.push({ id: uid(), model: cm, price: parseFloat(cp) }); log(nd, `Cena: ${cm}=${fm(cp)}`); setData(nd); sv(nd); setShowCost(false); setCm(""); setCp(""); };
-  const delC = c => { const nd = { ...data, costs: data.costs.filter(x => x.id !== c.id) }; setData(nd); sv(nd); };
+  const delC = c => { if (!confirm(`Obriši nabavnu cenu za ${c.model} (${fm(c.price)})?`)) return; const nd = { ...data, costs: data.costs.filter(x => x.id !== c.id) }; log(nd, `Obrisana nabavna cena: ${c.model}, ${fm(c.price)}`); setData(nd); sv(nd); };
   const addA = () => { if (!aa) return; const nd = { ...data }; nd.adSpend.push({ id: uid(), date: ad, amount: parseFloat(aa) }); log(nd, `Reklame ${ad}: ${fm(aa)}`); setData(nd); sv(nd); setShowAd(false); setAa(""); };
-  const delA = a => { const nd = { ...data, adSpend: data.adSpend.filter(x => x.id !== a.id) }; setData(nd); sv(nd); };
+  const delA = a => { if (!confirm(`Obriši zapis reklame od ${fm(a.amount)} (${fd(a.date + "T00:00:00")})?`)) return; const nd = { ...data, adSpend: data.adSpend.filter(x => x.id !== a.id) }; log(nd, `Obrisana reklama: ${fd(a.date + "T00:00:00")}, ${fm(a.amount)}`); setData(nd); sv(nd); };
 
   const getCost = ms => { let t = 0; for (const c of data.costs) { if (ms?.toLowerCase().includes(c.model.toLowerCase())) t += c.price; } return t; };
   const daily = useMemo(() => {
@@ -945,14 +945,36 @@ function ProfitPage({ data, setData, log, goBack }) {
   const [pg, setPg] = useState(0);
   const pagedD = daily.slice(pg * PER_PAGE, (pg + 1) * PER_PAGE);
 
-  if (tab === "costs") return <div style={{ padding: "14px 14px 20px" }}><button onClick={() => setTab("main")} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Profit</button><button onClick={() => setShowCost(true)} style={{ ...S.btn, width: "100%", marginBottom: 14, padding: "12px" }}><Ic d={I.plus} size={16} color="#000" /> Dodaj cenu</button>{data.costs.map(c => <div key={c.id} style={{ ...S.card, display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><div style={{ fontWeight: 700 }}>{c.model}</div><div style={{ fontSize: 13, color: C.accent, fontFamily: FM, fontWeight: 700 }}>{fm(c.price)}</div></div><button onClick={() => delC(c)} style={{ ...S.btnD, padding: "5px 7px" }}><Ic d={I.trash} size={14} color={C.danger} /></button></div>)}{showCost && <Modal title="Nabavna cena" onClose={() => setShowCost(false)}><Fl label="Model"><select style={S.sel} value={cm} onChange={e => setCm(e.target.value)}><option value="">—</option>{data.models.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}</select></Fl><Fl label="Cena (RSD) *"><input style={S.inp} type="number" value={cp} onChange={e => setCp(e.target.value)} placeholder="1500" /></Fl><button onClick={addC} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 15 }}>Sačuvaj</button></Modal>}</div>;
+  if (tab === "costs") return <div style={{ padding: "14px 14px 20px" }}><button onClick={() => setTab("main")} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Profit</button><button onClick={() => setShowCost(true)} style={{ ...S.btn, width: "100%", marginBottom: 14, padding: "12px" }}><Ic d={I.plus} size={16} color="#000" /> Dodaj cenu</button>{data.costs.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}>💰 Nema zapisa</div>}{data.costs.map(c => <div key={c.id} style={{ ...S.card, display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><div style={{ fontWeight: 700 }}>{c.model}</div><div style={{ fontSize: 13, color: C.accent, fontFamily: FM, fontWeight: 700 }}>{fm(c.price)}</div></div><button onClick={() => delC(c)} style={{ ...S.btnD, padding: "5px 7px" }}><Ic d={I.trash} size={14} color={C.danger} /></button></div>)}{showCost && <Modal title="Nabavna cena" onClose={() => setShowCost(false)}><Fl label="Model"><select style={S.sel} value={cm} onChange={e => setCm(e.target.value)}><option value="">—</option>{data.models.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}</select></Fl><Fl label="Cena (RSD) *"><input style={S.inp} type="number" value={cp} onChange={e => setCp(e.target.value)} placeholder="1500" /></Fl><button onClick={addC} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 15 }}>Sačuvaj</button></Modal>}</div>;
+
+  if (tab === "ads") {
+    const adsSorted = [...(data.adSpend || [])].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+    return <div style={{ padding: "14px 14px 20px" }}>
+      <button onClick={() => setTab("main")} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Profit</button>
+      <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid #fb923c33`, background: "rgba(251,146,60,0.08)", padding: 14 }}>
+        <div style={S.stL}>Ukupno reklame</div>
+        <div style={{ ...S.stV, fontSize: 24, color: "#fb923c" }}>{fm(adsSorted.reduce((s, a) => s + (a.amount || 0), 0))}</div>
+        <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{adsSorted.length} zapisa</div>
+      </div>
+      <button onClick={() => setShowAd(true)} style={{ ...S.btn, width: "100%", marginBottom: 14, padding: "12px" }}><Ic d={I.plus} size={16} color="#000" /> Dodaj reklamu</button>
+      {adsSorted.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}>📢 Nema zapisa reklama</div>}
+      {adsSorted.map(a => <div key={a.id} style={{ ...S.card, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <div style={{ fontWeight: 700 }}>{fd(a.date + "T00:00:00")}</div>
+          <div style={{ fontSize: 14, color: "#fb923c", fontFamily: FM, fontWeight: 700, marginTop: 2 }}>{fm(a.amount)}</div>
+        </div>
+        <button onClick={() => delA(a)} style={{ ...S.btnD, padding: "7px 10px" }}><Ic d={I.trash} size={14} color={C.danger} /></button>
+      </div>)}
+      {showAd && <Modal title="📢 Nova reklama" onClose={() => setShowAd(false)}><Fl label="Datum"><input style={S.inp} type="date" value={ad} onChange={e => setAd(e.target.value)} /></Fl><Fl label="Iznos *"><input style={S.inp} type="number" value={aa} onChange={e => setAa(e.target.value)} placeholder="5000" /></Fl><button onClick={addA} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 15 }}>Sačuvaj</button></Modal>}
+    </div>;
+  }
 
   return (
     <div style={{ padding: "14px 14px 20px" }}>
       <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Nazad</button>
       <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid ${totP > 0 ? C.success + "33" : C.danger + "33"}`, background: totP > 0 ? C.successBg : C.dangerBg, padding: 16 }}><div style={S.stL}>Ukupan profit</div><div style={{ ...S.stV, fontSize: 28, color: totP > 0 ? C.success : C.danger }}>{fm(totP)}</div></div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}><div style={S.stat}><div style={S.stL}>Otkup</div><div style={{ ...S.stV, fontSize: 14, color: C.info }}>{fm(totR)}</div></div><div style={S.stat}><div style={S.stL}>Nabavka</div><div style={{ ...S.stV, fontSize: 14, color: C.danger }}>{fm(totC)}</div></div><div style={S.stat}><div style={S.stL}>Reklame</div><div style={{ ...S.stV, fontSize: 14, color: "#fb923c" }}>{fm(totA)}</div></div></div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}><button onClick={() => setTab("costs")} style={{ ...S.btn2, flex: 1, fontSize: 13 }}>💰 Nabavne cene</button><button onClick={() => setShowAd(true)} style={{ ...S.btn2, flex: 1, fontSize: 13, color: "#fb923c", borderColor: "#fb923c44" }}>📢 Reklama</button></div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}><button onClick={() => setTab("costs")} style={{ ...S.btn2, flex: 1, fontSize: 13 }}>💰 Nabavne cene</button><button onClick={() => setTab("ads")} style={{ ...S.btn2, flex: 1, fontSize: 13, color: "#fb923c", borderColor: "#fb923c44" }}>📢 Reklame</button></div>
       <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>📊 Dnevni pregled</div>
       {pagedD.map(d => <div key={d.date} style={S.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}><div style={{ fontWeight: 700, fontSize: 14 }}>{fd(d.date + "T00:00:00")}</div><div style={{ fontWeight: 800, fontFamily: FM, fontSize: 15, color: d.profit > 0 ? C.success : C.danger }}>{fm(d.profit)}</div></div><div style={{ display: "flex", gap: 12, fontSize: 12, color: C.dim, flexWrap: "wrap" }}><span>Otkup: {fm(d.rev)}</span><span>Nabavka: {fm(d.cost)}</span>{d.ads > 0 && <span>Reklame: {fm(d.ads)}</span>}<span>{d.n} nar.</span></div></div>)}
       <Pager page={pg} total={daily.length} setPage={setPg} />
