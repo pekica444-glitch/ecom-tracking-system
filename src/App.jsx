@@ -80,6 +80,12 @@ const PER_PAGE = 15;
 const SK = "ecom-v1";
 const blank = () => ({ orders: [], finances: [], inventory: [], history: [], models: [], costs: [], adSpend: [] });
 
+// Count total meaningful records - used to detect "empty overwriting rich"
+function dataSize(d) {
+  if (!d) return 0;
+  return (d.orders?.length || 0) + (d.finances?.length || 0) + (d.inventory?.length || 0) + (d.models?.length || 0) + (d.costs?.length || 0) + (d.adSpend?.length || 0);
+}
+
 async function ld() {
   if (supabase) {
     try {
@@ -95,6 +101,18 @@ async function ld() {
 async function sv(d) {
   if (supabase) {
     try {
+      // CRITICAL SAFETY: Check current DB state before overwriting
+      // Prevents "empty client overwrites populated DB" scenario
+      const { data: existing } = await supabase.from("app_state").select("data").eq("id", "main").maybeSingle();
+      const existingSize = dataSize(existing?.data);
+      const newSize = dataSize(d);
+      // If DB has significantly more data than what we're trying to save, abort
+      // (allow history-only saves which might be 1-2 entries larger, but not wipes)
+      if (existingSize > 5 && newSize < existingSize - 2) {
+        console.warn(`⚠️ Prevented data loss: DB has ${existingSize} records, trying to save ${newSize}. Aborting.`);
+        alert("⚠️ Upozorenje: Otkrivena je nekonzistentnost podataka. Osvežite stranicu (F5) da dobijete najnovije podatke pre sledećeg unosa.");
+        return;
+      }
       await supabase.from("app_state").upsert({ id: "main", data: d, updated_at: new Date().toISOString() });
     } catch (e) { console.error("Supabase save error:", e); }
     return;
