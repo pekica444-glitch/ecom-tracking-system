@@ -162,7 +162,7 @@ function Login({ onLogin }) {
   const [u, setU] = useState(() => { try { return localStorage.getItem("ecom-rem-u") || ""; } catch { return ""; } });
   const [p, setP] = useState(() => { try { return localStorage.getItem("ecom-rem-p") || ""; } catch { return ""; } });
   const [err, setErr] = useState(""); const [sh, setSh] = useState(false);
-  const [remember, setRemember] = useState(() => { try { return !!localStorage.getItem("ecom-rem-u"); } catch { return false; } });
+  const [remember, setRemember] = useState(true); // default ON - aplikacija nikad ne izloguje pri refresh
   const go = () => {
     const user = USERS.find(x => x.username === u && x.password === p);
     if (user) {
@@ -1184,7 +1184,16 @@ function UrgentnoPage({ data, setData, user, log, goBack }) {
 // MAIN
 // ═══════════════════════════════════════════════════════════════
 export default function App() {
-  const [user, setUser] = useState(null); const [page, setPage] = useState("orders");
+  const [user, setUser] = useState(() => {
+    // Auto-login at app mount - no flash of login screen on refresh
+    try {
+      const su = localStorage.getItem("ecom-rem-u");
+      const sp = localStorage.getItem("ecom-rem-p");
+      if (su && sp) return USERS.find(x => x.username === su && x.password === sp) || null;
+    } catch {}
+    return null;
+  });
+  const [page, setPage] = useState("orders");
   const [data, setData] = useState(blank()); const [loading, setLoading] = useState(true);
   const ww = useWW();
   const isDesktop = ww >= 900;
