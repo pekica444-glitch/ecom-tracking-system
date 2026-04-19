@@ -1302,24 +1302,25 @@ export default function App() {
   const [page, setPage] = useState("orders");
   const [data, setDataRaw] = useState(blank()); const [loading, setLoading] = useState(true);
   const dataRef = useRef(data);
-  const skipSyncRef = useRef(false); // set to true to skip DB sync (for remote-driven updates)
-  // Keep ref in sync with state
+  const lastSyncedRef = useRef(blank()); // what's actually in DB (source of truth for prev)
+  const skipSyncRef = useRef(false);
   useEffect(() => { dataRef.current = data; }, [data]);
 
   // Smart setData that auto-syncs changes to DB (per-entity diff)
   const setData = useCallback((updater) => {
-    // CRITICAL: snapshot prev state via deep clone to avoid mutation bug
-    // (some code uses shallow {...data} then mutates nd.orders.unshift which also mutates the ref)
-    const prev = JSON.parse(JSON.stringify(dataRef.current));
     const next = typeof updater === "function" ? updater(dataRef.current) : updater;
     dataRef.current = next;
     setDataRaw(next);
-    // Sync to DB unless we're processing a remote-originated update
     if (!skipSyncRef.current) {
-      console.log("[setData] syncing changes to DB (orders:", prev.orders?.length || 0, "→", next.orders?.length || 0, ")");
+      // Use lastSyncedRef as "prev" - this is what DB currently has
+      const prev = lastSyncedRef.current;
+      console.log("[setData] syncing (orders:", prev.orders?.length || 0, "→", next.orders?.length || 0, ")");
+      // Update lastSyncedRef BEFORE syncDiff with deep clone so subsequent calls see the current state
+      lastSyncedRef.current = JSON.parse(JSON.stringify(next));
       syncDiff(prev, next).catch(e => console.error("syncDiff error:", e));
     } else {
-      console.log("[setData] skipping sync (remote update)");
+      // Remote update — still update lastSynced to match
+      lastSyncedRef.current = JSON.parse(JSON.stringify(next));
     }
   }, []);
 
@@ -1329,6 +1330,7 @@ export default function App() {
     try {
       const d = await ld();
       dataRef.current = d;
+      lastSyncedRef.current = JSON.parse(JSON.stringify(d));
       setDataRaw(d);
     } finally {
       skipSyncRef.current = false;
