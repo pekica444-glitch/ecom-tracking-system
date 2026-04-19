@@ -170,6 +170,7 @@ async function syncDiff(oldData, newData) {
     return;
   }
   const entities = ["orders", "finances", "inventory", "models", "costs", "adSpend", "history"];
+  let totalOps = 0;
   for (const ent of entities) {
     const oldArr = oldData?.[ent] || [];
     const newArr = newData?.[ent] || [];
@@ -179,6 +180,8 @@ async function syncDiff(oldData, newData) {
     // Brisani (u old a nema u new)
     for (const [id] of oldMap) {
       if (!newMap.has(id)) {
+        console.log(`[syncDiff] DELETE ${ent}/${id}`);
+        totalOps++;
         await dbDelete(ent, id);
       }
     }
@@ -187,17 +190,22 @@ async function syncDiff(oldData, newData) {
       const oldRow = oldMap.get(id);
       if (!oldRow) {
         // Novi zapis
+        console.log(`[syncDiff] INSERT ${ent}/${id}`);
+        totalOps++;
         await dbUpsert(ent, row);
       } else {
         // Proveri da li je promenjen (plitko poređenje kroz JSON)
         try {
           if (JSON.stringify(oldRow) !== JSON.stringify(row)) {
+            console.log(`[syncDiff] UPDATE ${ent}/${id}`);
+            totalOps++;
             await dbUpsert(ent, row);
           }
         } catch { await dbUpsert(ent, row); }
       }
     }
   }
+  console.log(`[syncDiff] Done. Total ops: ${totalOps}`);
 }
 
 function copyText(text) {
@@ -1300,13 +1308,15 @@ export default function App() {
 
   // Smart setData that auto-syncs changes to DB (per-entity diff)
   const setData = useCallback((updater) => {
-    const prev = dataRef.current;
-    const next = typeof updater === "function" ? updater(prev) : updater;
+    // CRITICAL: snapshot prev state via deep clone to avoid mutation bug
+    // (some code uses shallow {...data} then mutates nd.orders.unshift which also mutates the ref)
+    const prev = JSON.parse(JSON.stringify(dataRef.current));
+    const next = typeof updater === "function" ? updater(dataRef.current) : updater;
     dataRef.current = next;
     setDataRaw(next);
     // Sync to DB unless we're processing a remote-originated update
     if (!skipSyncRef.current) {
-      console.log("[setData] syncing changes to DB");
+      console.log("[setData] syncing changes to DB (orders:", prev.orders?.length || 0, "→", next.orders?.length || 0, ")");
       syncDiff(prev, next).catch(e => console.error("syncDiff error:", e));
     } else {
       console.log("[setData] skipping sync (remote update)");
