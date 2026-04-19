@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import * as XLSX from "xlsx";
 import { createClient } from "@supabase/supabase-js";
 
@@ -134,9 +134,16 @@ const TBL_MAP = { orders: "orders", finances: "finances", inventory: "inventory"
 async function dbUpsert(entity, row) {
   if (!supabase) return;
   try {
-    const { error } = await supabase.from(TBL_MAP[entity]).upsert(toDbRow(row));
-    if (error) console.error(`Upsert ${entity} error:`, error);
-  } catch (e) { console.error(e); }
+    const dbRow = toDbRow(row);
+    console.log(`[dbUpsert] ${entity}:`, dbRow);
+    const { data, error } = await supabase.from(TBL_MAP[entity]).upsert(dbRow).select();
+    if (error) {
+      console.error(`❌ Upsert ${entity} FAILED:`, error.message, error);
+      alert(`Upsert ${entity} greška: ${error.message}`);
+    } else {
+      console.log(`✅ Upsert ${entity} OK:`, data);
+    }
+  } catch (e) { console.error("Upsert exception:", e); }
 }
 
 async function dbDelete(entity, id) {
@@ -1286,18 +1293,40 @@ export default function App() {
   });
   const [page, setPage] = useState("orders");
   const [data, setDataRaw] = useState(blank()); const [loading, setLoading] = useState(true);
+  const dataRef = useRef(data);
+  const skipSyncRef = useRef(false); // set to true to skip DB sync (for remote-driven updates)
+  // Keep ref in sync with state
+  useEffect(() => { dataRef.current = data; }, [data]);
+
   // Smart setData that auto-syncs changes to DB (per-entity diff)
   const setData = useCallback((updater) => {
-    setDataRaw(prev => {
-      const next = typeof updater === "function" ? updater(prev) : updater;
-      // Fire-and-forget DB sync (non-blocking)
+    const prev = dataRef.current;
+    const next = typeof updater === "function" ? updater(prev) : updater;
+    dataRef.current = next;
+    setDataRaw(next);
+    // Sync to DB unless we're processing a remote-originated update
+    if (!skipSyncRef.current) {
+      console.log("[setData] syncing changes to DB");
       syncDiff(prev, next).catch(e => console.error("syncDiff error:", e));
-      return next;
-    });
+    } else {
+      console.log("[setData] skipping sync (remote update)");
+    }
+  }, []);
+
+  // Load data WITHOUT triggering sync
+  const loadFromDb = useCallback(async () => {
+    skipSyncRef.current = true;
+    try {
+      const d = await ld();
+      dataRef.current = d;
+      setDataRaw(d);
+    } finally {
+      skipSyncRef.current = false;
+    }
   }, []);
   const ww = useWW();
   const isDesktop = ww >= 900;
-  useEffect(() => { ld().then(d => { setData(d); setLoading(false); }); }, []);
+  useEffect(() => { loadFromDb().then(() => setLoading(false)); }, []);
 
   // Real-time sync: listen for changes from other users on ALL tables
   useEffect(() => {
@@ -1307,7 +1336,7 @@ export default function App() {
       if (reloadTimer) return;
       reloadTimer = setTimeout(() => {
         reloadTimer = null;
-        ld().then(d => setDataRaw(d)).catch(e => console.error("Reload error:", e));
+        loadFromDb().catch(e => console.error("Reload error:", e));
       }, 500); // debounce — wait 500ms to batch multiple changes
     };
     const ch = supabase.channel("ecom-all-tables")
@@ -1325,7 +1354,7 @@ export default function App() {
   // Fallback polling when Supabase not used
   useEffect(() => {
     if (!user || supabase) return;
-    const iv = setInterval(() => { ld().then(d => setData(d)); }, 20000);
+    const iv = setInterval(() => { loadFromDb(); }, 20000);
     return () => clearInterval(iv);
   }, [user]);
 
