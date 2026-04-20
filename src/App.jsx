@@ -464,16 +464,24 @@ function OrdersPage({ data, setData, user, log }) {
     return m;
   }, [data.inventory]);
 
-  const hasInInventory = o => {
+  // Detailed inventory status: "full" (sve ima), "partial" (delimicno), "none" (nista)
+  const invStatus = (o) => {
     if (!o.models || !o.models.length) {
       const k = (o.model || "").toLowerCase().trim();
-      return Object.keys(invLookup).some(ik => ik.startsWith(k));
+      const has = Object.keys(invLookup).some(ik => ik.startsWith(k));
+      return { level: has ? "full" : "none", hits: [], misses: has ? [] : [{ name: o.model, size: "" }] };
     }
-    return o.models.some(m => {
+    const hits = [], misses = [];
+    o.models.forEach(m => {
       const k = (m.name || "").toLowerCase().trim() + "|" + (m.size || "").trim();
-      return invLookup[k];
+      if (invLookup[k]) hits.push(m); else misses.push(m);
     });
+    if (hits.length === 0) return { level: "none", hits, misses };
+    if (misses.length === 0) return { level: "full", hits, misses };
+    return { level: "partial", hits, misses };
   };
+
+  const hasInInventory = o => invStatus(o).level !== "none";
 
   const active = data.orders.filter(o => !o.archived);
   const filtered = active.filter(o => {
@@ -552,10 +560,19 @@ function OrdersPage({ data, setData, user, log }) {
 
       {paged.map(o => {
         const st = getDispSt(o); const exp = expanded === o.id;
-        const acts = getActs(o); const inInv = hasInInventory(o);
+        const acts = getActs(o); const invS = invStatus(o); const inInv = invS.level !== "none";
         return (
-          <div key={o.id} style={{ ...S.card, cursor: "pointer", borderColor: inInv && !exp ? C.success + "55" : exp ? C.accent + "44" : C.border }} onClick={() => setExpanded(exp ? null : o.id)}>
-            {inInv && <div style={{ background: C.successBg, color: C.success, fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 8, marginBottom: 8, display: "inline-block", border: `1px solid ${C.success}33` }}>📦 IMA U POPISU — spremno za slanje</div>}
+          <div key={o.id} style={{ ...S.card, cursor: "pointer", borderColor: invS.level === "full" && !exp ? C.success + "55" : invS.level === "partial" && !exp ? "#fbbf2455" : exp ? C.accent + "44" : C.border }} onClick={() => setExpanded(exp ? null : o.id)}>
+            {invS.level === "full" && <div style={{ background: C.successBg, color: C.success, fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 8, marginBottom: 8, display: "inline-block", border: `1px solid ${C.success}33` }}>📦 IMA SVE U POPISU — spremno za slanje</div>}
+            {invS.level === "partial" && (
+              <div style={{ background: "rgba(251,191,36,0.12)", color: "#fbbf24", fontSize: 11, fontWeight: 700, padding: "6px 10px", borderRadius: 8, marginBottom: 8, border: `1px solid #fbbf2444`, lineHeight: 1.5 }}>
+                ⚠️ DELIMIČNO U POPISU
+                <div style={{ fontWeight: 500, marginTop: 3, color: C.text }}>
+                  {invS.hits.map((h, i) => <span key={"h"+i} style={{ marginRight: 8, color: C.success }}>✅ {h.name} {h.size}</span>)}
+                  {invS.misses.map((m, i) => <span key={"m"+i} style={{ marginRight: 8, color: C.danger }}>❌ {m.name} {m.size}</span>)}
+                </div>
+              </div>
+            )}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
               <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 700, fontSize: 15 }}>{o.name}</div><div style={{ fontSize: 12, color: C.dim, marginTop: 1 }}>{o.model || "—"}</div></div>
               <span style={S.badge(st.color, st.bg)}>{st.icon} {st.label}</span>
@@ -910,6 +927,167 @@ function InventoryPage({ data, setData, user, log }) {
 // ═══════════════════════════════════════════════════════════════
 // MORE / MODELS / HISTORY / PROFIT / EXPORT
 // ═══════════════════════════════════════════════════════════════
+function NabavkaPage({ data, goBack }) {
+  // Generiši spisak: svi modeli+brojevi iz porudžbina sa statusom "novo" (Za unos),
+  // preskačući one koji već postoje u popisu, sortirani od najstarije porudžbine
+  const spisak = useMemo(() => {
+    // Lookup popisa: map "model|size" → preostala količina
+    const invRemaining = {};
+    (data.inventory || []).forEach(it => {
+      const k = (it.name || "").toLowerCase().trim() + "|" + String(it.size || "").trim();
+      invRemaining[k] = (invRemaining[k] || 0) + (parseInt(it.quantity) || 0);
+    });
+
+    // Sve porudžbine Za unos, od najstarije
+    const zaUnos = (data.orders || [])
+      .filter(o => o.status === "novo" && !o.archived)
+      .sort((a, b) => new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0));
+
+    // Grupisano po modelu, redosled dodavanja sačuvan
+    const grouped = {}; // { "DRAGON": ["44", "45", "44", ...] }
+    const order = []; // redosled pojavljivanja modela
+
+    for (const o of zaUnos) {
+      const items = (o.models && o.models.length) ? o.models : [{ name: o.model, size: "" }];
+      for (const m of items) {
+        const modelName = (m.name || "").trim();
+        const size = String(m.size || "").trim();
+        if (!modelName) continue;
+        const k = modelName.toLowerCase() + "|" + size;
+        // Ako popis ima taj par → preskoči i smanji brojač u popisu
+        if ((invRemaining[k] || 0) > 0) {
+          invRemaining[k]--;
+          continue;
+        }
+        const key = modelName.toUpperCase();
+        if (!grouped[key]) { grouped[key] = []; order.push(key); }
+        grouped[key].push(size);
+      }
+    }
+    return { grouped, order, total: order.reduce((s, k) => s + grouped[k].length, 0), dateStr: fd(new Date().toISOString()) };
+  }, [data.orders, data.inventory]);
+
+  const textVersion = useMemo(() => {
+    const lines = [`🛍️ NABAVKA — ${spisak.dateStr}`, ""];
+    for (const model of spisak.order) {
+      lines.push(`${model}  ${spisak.grouped[model].join(" ")}`);
+    }
+    lines.push("", `Ukupno: ${spisak.total} pari`);
+    return lines.join("\n");
+  }, [spisak]);
+
+  const copyList = () => {
+    if (copyText(textVersion)) alert("✅ Spisak kopiran u clipboard");
+    else alert("⚠️ Nije moguće kopirati");
+  };
+
+  const downloadJPG = () => {
+    // Render u canvas pa izvezi kao JPG
+    const padding = 40;
+    const lineHeight = 44;
+    const modelWidth = 260;
+    const width = 900;
+    const headerHeight = 90;
+    const footerHeight = 70;
+    const contentHeight = spisak.order.length * lineHeight;
+    const height = headerHeight + contentHeight + footerHeight + padding * 2;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+
+    // Pozadina
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+
+    // Naslov
+    ctx.fillStyle = "#0a0a0d";
+    ctx.font = "bold 36px Arial, sans-serif";
+    ctx.fillText(`🛍️ NABAVKA — ${spisak.dateStr}`, padding, padding + 40);
+
+    // Linija ispod naslova
+    ctx.strokeStyle = "#f59e0b";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(padding, padding + 60);
+    ctx.lineTo(width - padding, padding + 60);
+    ctx.stroke();
+
+    // Modeli
+    let y = padding + headerHeight + 20;
+    ctx.font = "bold 28px Arial, sans-serif";
+    for (const model of spisak.order) {
+      ctx.fillStyle = "#0a0a0d";
+      ctx.fillText(model, padding, y);
+      ctx.fillStyle = "#f59e0b";
+      ctx.font = "bold 30px 'Courier New', monospace";
+      const sizes = spisak.grouped[model].join("  ");
+      ctx.fillText(sizes, padding + modelWidth, y);
+      ctx.font = "bold 28px Arial, sans-serif";
+      y += lineHeight;
+    }
+
+    // Footer
+    ctx.fillStyle = "#64748b";
+    ctx.font = "20px Arial, sans-serif";
+    ctx.fillText(`Ukupno: ${spisak.total} pari`, padding, height - padding - 20);
+    ctx.font = "14px Arial, sans-serif";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText(`Generisano: ${new Date().toLocaleString("sr-RS")}`, padding, height - padding);
+
+    // Download
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Nabavka-${new Date().toISOString().slice(0, 10)}.jpg`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }, "image/jpeg", 0.95);
+  };
+
+  return (
+    <div style={{ padding: "14px 14px 20px" }}>
+      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Nazad</button>
+
+      <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid #f59e0b33`, background: "rgba(245,158,11,0.08)", padding: 14 }}>
+        <div style={S.stL}>🛍️ Ukupno za nabavku</div>
+        <div style={{ ...S.stV, fontSize: 28, color: "#f59e0b" }}>{spisak.total} pari</div>
+        <div style={{ fontSize: 11, color: C.dim, marginTop: 4 }}>Iz porudžbina "Za unos" koje nisu u popisu</div>
+      </div>
+
+      {spisak.total === 0 ? (
+        <div style={{ textAlign: "center", padding: 40, color: C.dim, ...S.card }}>
+          ✅ Nema porudžbina za nabavku<br/>
+          <span style={{ fontSize: 12 }}>Sve što je naručeno ili je već u popisu ili nije status "Za unos"</span>
+        </div>
+      ) : (
+        <>
+          <div style={{ ...S.card, padding: 18, marginBottom: 14, fontFamily: FM, fontSize: 14, lineHeight: 1.9 }}>
+            <div style={{ fontWeight: 700, fontSize: 13, color: C.dim, marginBottom: 10, fontFamily: F }}>📋 Pregled — sortirano od najstarije porudžbine</div>
+            {spisak.order.map(model => (
+              <div key={model} style={{ display: "flex", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
+                <span style={{ fontWeight: 800, minWidth: 130 }}>{model}</span>
+                <span style={{ color: C.accent, fontWeight: 700, letterSpacing: 2 }}>{spisak.grouped[model].join("  ")}</span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+            <button onClick={downloadJPG} style={{ ...S.btn, flex: 1, padding: "13px", fontSize: 14 }}>🖼️ Preuzmi JPG</button>
+            <button onClick={copyList} style={{ ...S.btn2, flex: 1, padding: "13px", fontSize: 14 }}>📋 Kopiraj tekst</button>
+          </div>
+          <div style={{ fontSize: 11, color: C.dim, textAlign: "center", lineHeight: 1.5 }}>
+            💡 Tip: "Kopiraj tekst" je zgodan za slanje preko Viber-a ili SMS-a
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function MorePage({ setPage, user, data }) {
   const now = Date.now();
   const THREE = 3 * 24 * 60 * 60 * 1000;
@@ -972,6 +1150,7 @@ function MorePage({ setPage, user, data }) {
 
   const items = user.role === "admin" ? [
     { id: "urgentno", icon: "⚠️", l: "Urgentno", d: "Više od 3 dana bez isporuke", badge: urgentCount },
+    { id: "nabavka", icon: "🛍️", l: "Nabavka", d: "Spisak za kupovinu iz porudžbina" },
     { id: "models", icon: "👟", l: "Modeli patika", d: "Upravljaj modelima" },
     { id: "profit", icon: "📈", l: "Profit", d: "Zarada i troškovi" },
     { id: "history", icon: "📋", l: "Istorija", d: "Zapisi po danima" },
@@ -1415,7 +1594,7 @@ export default function App() {
   if (loading) return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, color: C.dim }}>Učitavanje...</div>;
   const isA = user.role === "admin";
   const navItems = [{ id: "orders", l: "Porudžbine", ic: I.orders }, { id: "finance", l: "Finansije", ic: I.finance }, { id: "archive", l: "Arhiva", ic: I.archive }, { id: "inventory", l: "Popis", ic: I.inventory }, { id: "more", l: "Više", ic: I.more }];
-  const titles = { orders: "📦 Porudžbine", finance: "💰 Finansije", archive: "📁 Arhiva", inventory: "👟 Popis", more: "⚙️ Više", models: "🏷️ Modeli", profit: "📈 Profit", history: "📋 Istorija", export: "📱 Export", urgentno: "⚠️ Urgentno" };
+  const titles = { orders: "📦 Porudžbine", finance: "💰 Finansije", archive: "📁 Arhiva", inventory: "👟 Popis", more: "⚙️ Više", models: "🏷️ Modeli", profit: "📈 Profit", history: "📋 Istorija", export: "📱 Export", urgentno: "⚠️ Urgentno", nabavka: "🛍️ Nabavka" };
   const mainP = ["orders", "finance", "archive", "inventory", "more"];
   const activeP = mainP.includes(page) ? page : "more";
 
@@ -1454,6 +1633,7 @@ export default function App() {
       {page === "history" && <HistoryPage data={data} goBack={() => setPage("more")} />}
       {page === "export" && <ExportPage data={data} goBack={() => setPage("more")} />}
       {page === "urgentno" && isA && <UrgentnoPage data={data} setData={setData} user={user} log={log} goBack={() => setPage("more")} />}
+      {page === "nabavka" && isA && <NabavkaPage data={data} goBack={() => setPage("more")} />}
       {!isDesktop && (
         <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: maxW, background: C.s1, borderTop: `1px solid ${C.border}`, display: "flex", zIndex: 100, paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
           {navItems.map(n => <button key={n.id} onClick={() => setPage(n.id)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "9px 2px", fontSize: 10, fontWeight: activeP === n.id ? 700 : 500, color: activeP === n.id ? C.accent : C.dim, background: "none", border: "none", cursor: "pointer", fontFamily: F, position: "relative" }}>{activeP === n.id && <div style={{ position: "absolute", top: 0, left: "20%", right: "20%", height: 3, background: C.accent, borderRadius: "0 0 3px 3px" }} />}<Ic d={n.ic} size={19} color={activeP === n.id ? C.accent : C.dim} />{n.l}</button>)}
