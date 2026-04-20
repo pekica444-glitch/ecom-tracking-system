@@ -458,24 +458,50 @@ function OrdersPage({ data, setData, user, log }) {
   };
 
   // Inventory matching
-  const invLookup = useMemo(() => {
-    const m = {};
-    data.inventory.forEach(it => { const k = (it.name || "").toLowerCase().trim() + "|" + (it.size || "").trim(); if (parseInt(it.quantity) > 0) m[k] = true; });
-    return m;
-  }, [data.inventory]);
-
-  // Detailed inventory status: "full" (sve ima), "partial" (delimicno), "none" (nista)
-  const invStatus = (o) => {
-    if (!o.models || !o.models.length) {
-      const k = (o.model || "").toLowerCase().trim();
-      const has = Object.keys(invLookup).some(ik => ik.startsWith(k));
-      return { level: has ? "full" : "none", hits: [], misses: has ? [] : [{ name: o.model, size: "" }] };
-    }
-    const hits = [], misses = [];
-    o.models.forEach(m => {
-      const k = (m.name || "").toLowerCase().trim() + "|" + (m.size || "").trim();
-      if (invLookup[k]) hits.push(m); else misses.push(m);
+  // Centralni registar rezervacija popisa: ide od najstarije porudžbine ka najnovijoj
+  // i "dodeljuje" dostupne pare iz popisa. Svaka porudžbina dobija mapu "koji njeni pari su rezervisani".
+  const invAllocation = useMemo(() => {
+    // Preostale količine po "model|size" ključu
+    const remaining = {};
+    (data.inventory || []).forEach(it => {
+      const k = (it.name || "").toLowerCase().trim() + "|" + String(it.size || "").trim();
+      const qty = parseInt(it.quantity) || 0;
+      if (qty > 0) remaining[k] = (remaining[k] || 0) + qty;
     });
+
+    // Samo relevantne porudžbine (nearhivirane, sa statusom "novo" = Za unos) sortirane od najstarije
+    // Za ostale statuse ne radimo rezervaciju — već se smatra da je proces u toku
+    const candidates = (data.orders || [])
+      .filter(o => !o.archived && o.status === "novo")
+      .sort((a, b) => new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0));
+
+    const perOrder = {}; // orderId → { hits: [...], misses: [...] }
+    for (const o of candidates) {
+      const items = (o.models && o.models.length) ? o.models : [{ name: o.model || "", size: "" }];
+      const hits = [], misses = [];
+      for (const m of items) {
+        const k = (m.name || "").toLowerCase().trim() + "|" + String(m.size || "").trim();
+        if ((remaining[k] || 0) > 0) {
+          remaining[k]--;
+          hits.push(m);
+        } else {
+          misses.push(m);
+        }
+      }
+      perOrder[o.id] = { hits, misses };
+    }
+    return perOrder;
+  }, [data.orders, data.inventory]);
+
+  // Detailed inventory status — koristi alokaciju
+  const invStatus = (o) => {
+    // Za statuse koji nisu "novo" (Za unos) — ne računamo rezervacije (proces u toku)
+    if (o.status !== "novo" || o.archived) {
+      return { level: "none", hits: [], misses: [] };
+    }
+    const alloc = invAllocation[o.id];
+    if (!alloc) return { level: "none", hits: [], misses: [] };
+    const { hits, misses } = alloc;
     if (hits.length === 0) return { level: "none", hits, misses };
     if (misses.length === 0) return { level: "full", hits, misses };
     return { level: "partial", hits, misses };
