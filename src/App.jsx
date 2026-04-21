@@ -608,7 +608,7 @@ function OrdersPage({ data, setData, user, log }) {
               </div>
             )}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-              <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 700, fontSize: 18 }}>{o.name}</div><div style={{ fontSize: 15, color: C.dim, marginTop: 2 }}>{o.model || "—"}</div></div>
+              <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 700, fontSize: 18 }}>{o.name}</div><div style={{ fontSize: 15, color: C.dim, marginTop: 2 }}>{o.model || "—"}</div>{o.idBroj && <div style={{ fontSize: 13, color: C.purple, fontWeight: 700, marginTop: 3 }}>ID: {o.idBroj}</div>}</div>
               <span style={S.badge(st.color, st.bg)}>{st.icon} {st.label}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
