@@ -608,7 +608,7 @@ function OrdersPage({ data, setData, user, log }) {
               </div>
             )}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-              <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 700, fontSize: 15 }}>{o.name}</div><div style={{ fontSize: 12, color: C.dim, marginTop: 1 }}>{o.model || "—"}</div></div>
+              <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 700, fontSize: 18 }}>{o.name}</div><div style={{ fontSize: 15, color: C.dim, marginTop: 2 }}>{o.model || "—"}</div></div>
               <span style={S.badge(st.color, st.bg)}>{st.icon} {st.label}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -617,10 +617,10 @@ function OrdersPage({ data, setData, user, log }) {
             </div>
             {exp && (
               <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12, marginBottom: 12 }}>
-                  <div><span style={{ color: C.dim }}>Tel:</span> {o.phone || "—"}</div>
-                  <div><span style={{ color: C.dim }}>Mesto:</span> {o.city || "—"}</div>
-                  <div style={{ gridColumn: "1/-1" }}><span style={{ color: C.dim }}>Adresa:</span> {o.address || "—"}</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12, marginBottom: 12 }}>
+                  <div style={{ fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Tel:</span> <span style={{ fontWeight: 600 }}>{o.phone || "—"}</span></div>
+                  <div style={{ fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Mesto:</span> <span style={{ fontWeight: 600 }}>{o.city || "—"}</span></div>
+                  <div style={{ gridColumn: "1/-1", fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Adresa:</span> <span style={{ fontWeight: 600 }}>{o.address || "—"}</span></div>
                   <div><span style={{ color: C.dim }}>ID:</span> <span style={{ color: C.purple, fontWeight: 600 }}>{o.idBroj || "—"}</span></div>
                   <div><span style={{ color: C.dim }}>PX:</span> {o.pxBroj ? <a href={trackUrl(o.pxBroj)} target="_blank" rel="noopener noreferrer" style={{ color: C.accent, fontWeight: 600, textDecoration: "underline", textDecorationStyle: "dotted" }} onClick={e => e.stopPropagation()}>{o.pxBroj}</a> : <span style={{ color: C.dim }}>—</span>}</div>
                   {o.dateDelivered && <div><span style={{ color: C.dim }}>Isporučeno:</span> {fd(o.dateDelivered)}</div>}
@@ -1464,8 +1464,8 @@ function UrgentnoPage({ data, setData, user, log, goBack }) {
           <div key={o.id} style={{ ...S.card, cursor: "pointer", borderColor: wasCalled ? C.success + "55" : C.danger + "55", background: wasCalled ? C.s1 : "rgba(239,68,68,0.05)" }} onClick={() => setExpanded(exp ? null : o.id)}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: 15 }}>{o.name}</div>
-                <div style={{ fontSize: 12, color: C.dim, marginTop: 1 }}>{o.model || "—"}</div>
+                <div style={{ fontWeight: 700, fontSize: 18 }}>{o.name}</div>
+                <div style={{ fontSize: 15, color: C.dim, marginTop: 2 }}>{o.model || "—"}</div>
               </div>
               <span style={S.badge(C.danger, C.dangerBg)}>⏰ {o.daysAgo} dana</span>
             </div>
@@ -1477,10 +1477,10 @@ function UrgentnoPage({ data, setData, user, log, goBack }) {
 
             {exp && (
               <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12, marginBottom: 12 }}>
-                  <div><span style={{ color: C.dim }}>Telefon:</span> <a href={`tel:${fmtPhoneForTel(o.phone)}`} style={{ color: C.accent, fontWeight: 700, textDecoration: "none" }}>{o.phone || "—"}</a></div>
-                  <div><span style={{ color: C.dim }}>Mesto:</span> {o.city || "—"}</div>
-                  <div style={{ gridColumn: "1/-1" }}><span style={{ color: C.dim }}>Adresa:</span> {o.address || "—"}</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12, marginBottom: 12 }}>
+                  <div style={{ fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Telefon:</span> <a href={`tel:${fmtPhoneForTel(o.phone)}`} style={{ color: C.accent, fontWeight: 700, textDecoration: "none" }}>{o.phone || "—"}</a></div>
+                  <div style={{ fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Mesto:</span> <span style={{ fontWeight: 600 }}>{o.city || "—"}</span></div>
+                  <div style={{ gridColumn: "1/-1", fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Adresa:</span> <span style={{ fontWeight: 600 }}>{o.address || "—"}</span></div>
                   <div><span style={{ color: C.dim }}>Iznos:</span> <span style={{ color: C.accent, fontWeight: 700, fontFamily: FM }}>{fm(o.codAmount)}</span></div>
                   <div><span style={{ color: C.dim }}>PX dobijen:</span> {fd(o.datePx || o.dateCreated)}</div>
                 </div>
