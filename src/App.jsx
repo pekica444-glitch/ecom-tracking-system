@@ -220,21 +220,21 @@ function copyText(text) {
 
 const F = `'Outfit',sans-serif`, FM = `'JetBrains Mono',monospace`;
 const C = { bg: "#0a0a0d", s1: "#131318", s2: "#1a1a21", s3: "#222230", border: "#2a2a35", text: "#eaeaf0", dim: "#7a7a8e", accent: "#f59e0b", accentBg: "rgba(245,158,11,0.1)", danger: "#ef4444", dangerBg: "rgba(239,68,68,0.1)", success: "#22c55e", successBg: "rgba(34,197,94,0.1)", info: "#3b82f6", infoBg: "rgba(59,130,246,0.1)", purple: "#a78bfa", purpleBg: "rgba(167,139,250,0.1)" };
-const bb = { border: "none", borderRadius: 10, cursor: "pointer", fontFamily: F, fontWeight: 600, fontSize: 14, transition: "all 0.15s", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 };
+const bb = { border: "none", borderRadius: 10, cursor: "pointer", fontFamily: F, fontWeight: 600, fontSize: 16, transition: "all 0.15s", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 };
 const S = {
-  inp: { width: "100%", padding: "11px 14px", background: C.s2, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text, fontSize: 14, fontFamily: F, outline: "none", boxSizing: "border-box" },
-  sel: { width: "100%", padding: "11px 14px", background: C.s2, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text, fontSize: 14, fontFamily: F, outline: "none", boxSizing: "border-box", appearance: "none" },
-  ta: { width: "100%", padding: "11px 14px", background: C.s2, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text, fontSize: 14, fontFamily: F, outline: "none", boxSizing: "border-box", resize: "vertical", minHeight: 80 },
-  lb: { fontSize: 11, fontWeight: 700, color: C.dim, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.8 },
+  inp: { width: "100%", padding: "11px 14px", background: C.s2, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text, fontSize: 16, fontFamily: F, outline: "none", boxSizing: "border-box" },
+  sel: { width: "100%", padding: "11px 14px", background: C.s2, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text, fontSize: 16, fontFamily: F, outline: "none", boxSizing: "border-box", appearance: "none" },
+  ta: { width: "100%", padding: "11px 14px", background: C.s2, border: `1px solid ${C.border}`, borderRadius: 10, color: C.text, fontSize: 16, fontFamily: F, outline: "none", boxSizing: "border-box", resize: "vertical", minHeight: 80 },
+  lb: { fontSize: 13, fontWeight: 700, color: C.dim, marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: 0.8 },
   card: { background: C.s1, borderRadius: 14, border: `1px solid ${C.border}`, padding: 16, marginBottom: 10 },
   btn: { ...bb, padding: "11px 18px", background: C.accent, color: "#000" },
   btn2: { ...bb, padding: "9px 14px", background: C.s2, color: C.text, border: `1px solid ${C.border}` },
   btnD: { ...bb, padding: "9px 14px", background: C.dangerBg, color: C.danger },
-  btnS: { ...bb, padding: "5px 11px", fontSize: 12 },
-  badge: (c, bg) => ({ display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, color: c, background: bg, whiteSpace: "nowrap" }),
+  btnS: { ...bb, padding: "5px 11px", fontSize: 14 },
+  badge: (c, bg) => ({ display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 10px", borderRadius: 20, fontSize: 13, fontWeight: 700, color: c, background: bg, whiteSpace: "nowrap" }),
   stat: { background: C.s2, borderRadius: 12, padding: 12 },
-  stL: { fontSize: 10, fontWeight: 700, color: C.dim, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 3 },
-  stV: { fontSize: 20, fontWeight: 800, fontFamily: FM, letterSpacing: -0.5 },
+  stL: { fontSize: 12, fontWeight: 700, color: C.dim, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 3 },
+  stV: { fontSize: 22, fontWeight: 800, fontFamily: FM, letterSpacing: -0.5 },
   over: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 200 },
   modal: { background: C.s1, borderRadius: "20px 20px 0 0", padding: "20px 18px 28px", width: "100%", maxWidth: 480, maxHeight: "92vh", overflowY: "auto", border: `1px solid ${C.border}`, borderBottom: "none" },
 };
@@ -249,7 +249,7 @@ function useWW() {
 }
 
 function Modal({ title, onClose, children }) {
-  return <div style={S.over} onClick={onClose}><div style={S.modal} onClick={e => e.stopPropagation()}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}><h2 style={{ fontSize: 17, fontWeight: 800, margin: 0 }}>{title}</h2><button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: C.dim, padding: 4 }}><Ic d={I.x} /></button></div>{children}</div></div>;
+  return <div style={S.over} onClick={onClose}><div style={S.modal} onClick={e => e.stopPropagation()}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}><h2 style={{ fontSize: 19, fontWeight: 800, margin: 0 }}>{title}</h2><button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: C.dim, padding: 4 }}><Ic d={I.x} /></button></div>{children}</div></div>;
 }
 
 function Pager({ page, total, setPage }) {
@@ -258,7 +258,7 @@ function Pager({ page, total, setPage }) {
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, padding: "14px 0" }}>
       <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} style={{ ...S.btnS, background: C.s2, color: page === 0 ? C.border : C.text, border: `1px solid ${C.border}`, padding: "7px 14px" }}>‹ Preth</button>
-      <span style={{ fontSize: 13, color: C.dim, fontFamily: FM }}>{page + 1}/{pages}</span>
+      <span style={{ fontSize: 15, color: C.dim, fontFamily: FM }}>{page + 1}/{pages}</span>
       <button onClick={() => setPage(Math.min(pages - 1, page + 1))} disabled={page >= pages - 1} style={{ ...S.btnS, background: C.s2, color: page >= pages - 1 ? C.border : C.text, border: `1px solid ${C.border}`, padding: "7px 14px" }}>Sled ›</button>
     </div>
   );
@@ -290,18 +290,18 @@ function Login({ onLogin }) {
       }
     } catch {}
   }, []);
-  return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: F }}><div style={{ width: "100%", maxWidth: 340 }}><div style={{ textAlign: "center", marginBottom: 36 }}><div style={{ fontSize: 44, fontWeight: 900, background: `linear-gradient(135deg,${C.accent},#ef4444)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>👟 eCom</div><div style={{ fontSize: 12, color: C.dim, marginTop: 4, letterSpacing: 3, textTransform: "uppercase" }}>Tracking System</div></div><div style={{ ...S.card, padding: 22 }}><Fl label="Korisničko ime"><input style={S.inp} value={u} onChange={e => setU(e.target.value)} placeholder="Ime..." onKeyDown={e => e.key === "Enter" && go()} /></Fl><Fl label="Lozinka"><div style={{ position: "relative" }}><input style={S.inp} type={sh ? "text" : "password"} value={p} onChange={e => setP(e.target.value)} placeholder="Lozinka..." onKeyDown={e => e.key === "Enter" && go()} /><button onClick={() => setSh(!sh)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: C.dim, cursor: "pointer", fontSize: 11, fontFamily: F }}>{sh ? "Sakrij" : "Prikaži"}</button></div></Fl>
+  return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: F }}><div style={{ width: "100%", maxWidth: 340 }}><div style={{ textAlign: "center", marginBottom: 36 }}><div style={{ fontSize: 44, fontWeight: 900, background: `linear-gradient(135deg,${C.accent},#ef4444)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>👟 eCom</div><div style={{ fontSize: 14, color: C.dim, marginTop: 4, letterSpacing: 3, textTransform: "uppercase" }}>Tracking System</div></div><div style={{ ...S.card, padding: 22 }}><Fl label="Korisničko ime"><input style={S.inp} value={u} onChange={e => setU(e.target.value)} placeholder="Ime..." onKeyDown={e => e.key === "Enter" && go()} /></Fl><Fl label="Lozinka"><div style={{ position: "relative" }}><input style={S.inp} type={sh ? "text" : "password"} value={p} onChange={e => setP(e.target.value)} placeholder="Lozinka..." onKeyDown={e => e.key === "Enter" && go()} /><button onClick={() => setSh(!sh)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: C.dim, cursor: "pointer", fontSize: 13, fontFamily: F }}>{sh ? "Sakrij" : "Prikaži"}</button></div></Fl>
     <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", marginBottom: 14, padding: "6px 4px" }}>
       <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} style={{ width: 18, height: 18, accentColor: C.accent, cursor: "pointer" }} />
-      <span style={{ fontSize: 13, color: C.dim }}>Zapamti me na ovom uređaju</span>
+      <span style={{ fontSize: 15, color: C.dim }}>Zapamti me na ovom uređaju</span>
     </label>
-    {err && <div style={{ color: C.danger, fontSize: 13, marginBottom: 10, textAlign: "center" }}>{err}</div>}<button onClick={go} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 15 }}>Prijavi se</button></div></div></div>;
+    {err && <div style={{ color: C.danger, fontSize: 15, marginBottom: 10, textAlign: "center" }}>{err}</div>}<button onClick={go} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 17 }}>Prijavi se</button></div></div></div>;
 }
 
 // ═══════════════════════════════════════════════════════════════
 // ORDERS
 // ═══════════════════════════════════════════════════════════════
-function OrdersPage({ data, setData, user, log }) {
+function OrdersPage({ data, setData, user, log, loadFromDb }) {
   const [showNew, setShowNew] = useState(false);
   const [search, setSearch] = useState("");
   const [filterSt, setFilterSt] = useState("all");
@@ -407,7 +407,30 @@ function OrdersPage({ data, setData, user, log }) {
     const nd = { ...data }; const i = nd.orders.findIndex(o => o.id === returModal.id); const o = nd.orders[i];
     nd.orders[i] = { ...o, status: "odbijeno", returPostarina: rp, dateReturned: new Date().toISOString() };
     if (rp > 0) nd.finances.unshift({ id: uid(), type: "retur", worker: o.assignedTo, amount: rp, date: new Date().toISOString(), note: `Vraćena: ${o.name}, PX: ${o.pxBroj || "—"}` });
-    log(nd, `Odbijeno: ${o.name}, retur: ${fm(rp)}, radnik: ${o.assignedTo}`);
+
+    // Auto-add returned items back to inventory
+    const items = (Array.isArray(o.models) && o.models.length) ? o.models : [{ name: o.model || "", size: "" }];
+    const returnedBack = [];
+    for (const m of items) {
+      const mName = (m.name || "").trim();
+      const mSize = String(m.size || "").trim();
+      if (!mName) continue;
+      // Find existing inventory entry (case-insensitive match on name + size)
+      const invIdx = nd.inventory.findIndex(it =>
+        (it.name || "").toLowerCase().trim() === mName.toLowerCase() &&
+        String(it.size || "").trim() === mSize
+      );
+      if (invIdx >= 0) {
+        // Increment existing
+        nd.inventory[invIdx] = { ...nd.inventory[invIdx], quantity: (parseInt(nd.inventory[invIdx].quantity) || 0) + 1 };
+      } else {
+        // Create new entry
+        nd.inventory.unshift({ id: uid(), name: mName, size: mSize, quantity: 1, note: `Vraćeno iz porudžbine ${o.name}`, dateAdded: new Date().toISOString() });
+      }
+      returnedBack.push(`${mName} ${mSize}`.trim());
+    }
+
+    log(nd, `Odbijeno: ${o.name}, retur: ${fm(rp)}, radnik: ${o.assignedTo}${returnedBack.length ? ` • Vraćeno u popis: ${returnedBack.join(", ")}` : ""}`);
     setData(nd); sv(nd); setReturModal(null);
   };
 
@@ -557,22 +580,22 @@ function OrdersPage({ data, setData, user, log }) {
     <div style={{ padding: "14px 14px 20px" }}>
       {user.role === "worker" && undoData && (Date.now() - undoData.time < 6e5) && (
         <div style={{ background: "rgba(251,146,60,0.15)", border: "1px solid rgba(251,146,60,0.3)", borderRadius: 12, padding: "10px 14px", marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontSize: 13 }}>↩️ <strong>{undoData.action}</strong></div>
+          <div style={{ fontSize: 15 }}>↩️ <strong>{undoData.action}</strong></div>
           <button onClick={workerUndo} style={{ ...S.btnS, background: "#fb923c", color: "#000", border: "none", padding: "6px 14px" }}>UNDO</button>
         </div>
       )}
 
       <div style={{ position: "relative", marginBottom: 10 }}>
-        <input style={{ ...S.inp, paddingLeft: 36, fontSize: 13 }} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} placeholder="Ime, PX, telefon..." />
+        <input style={{ ...S.inp, paddingLeft: 36, fontSize: 15 }} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} placeholder="Ime, PX, telefon..." />
         <div style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)" }}><Ic d={I.search} size={16} color={C.dim} /></div>
       </div>
 
       {/* Status - two rows */}
       <div style={{ display: "flex", gap: 5, marginBottom: 5 }}>
-        {stRow1.map(f => <button key={f.v} onClick={() => { setFilterSt(f.v); setPage(0); }} style={{ ...S.btnS, flex: 1, background: filterSt === f.v ? C.accent : C.s2, color: filterSt === f.v ? "#000" : C.text, border: `1px solid ${filterSt === f.v ? C.accent : C.border}` }}>{f.l}</button>)}
+        {stRow1.map(f => <button key={f.v} onClick={() => { setFilterSt(f.v); setPage(0); loadFromDb && loadFromDb(); }} style={{ ...S.btnS, flex: 1, background: filterSt === f.v ? C.accent : C.s2, color: filterSt === f.v ? "#000" : C.text, border: `1px solid ${filterSt === f.v ? C.accent : C.border}` }}>{f.l}</button>)}
       </div>
       <div style={{ display: "flex", gap: 5 }}>
-        {stRow2.map(f => <button key={f.v} onClick={() => { setFilterSt(f.v); setPage(0); }} style={{ ...S.btnS, flex: 1, background: filterSt === f.v ? (ST[f.v]?.color || C.accent) : C.s2, color: filterSt === f.v ? "#000" : C.text, border: `1px solid ${filterSt === f.v ? (ST[f.v]?.color || C.accent) : C.border}` }}>{f.l}</button>)}
+        {stRow2.map(f => <button key={f.v} onClick={() => { setFilterSt(f.v); setPage(0); loadFromDb && loadFromDb(); }} style={{ ...S.btnS, flex: 1, background: filterSt === f.v ? (ST[f.v]?.color || C.accent) : C.s2, color: filterSt === f.v ? "#000" : C.text, border: `1px solid ${filterSt === f.v ? (ST[f.v]?.color || C.accent) : C.border}` }}>{f.l}</button>)}
       </div>
 
       <div style={{ height: 1, background: C.border, margin: "14px 0 12px" }} />
@@ -588,7 +611,7 @@ function OrdersPage({ data, setData, user, log }) {
         </div>
       )}
 
-      <div style={{ fontSize: 12, color: C.dim, marginBottom: 8 }}>Prikazano: {sorted.length}</div>
+      <div style={{ fontSize: 14, color: C.dim, marginBottom: 8 }}>Prikazano: {sorted.length}</div>
 
       {paged.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}>📦 Nema rezultata</div>}
 
@@ -597,9 +620,9 @@ function OrdersPage({ data, setData, user, log }) {
         const acts = getActs(o); const invS = invStatus(o); const inInv = invS.level !== "none";
         return (
           <div key={o.id} style={{ ...S.card, cursor: "pointer", borderColor: invS.level === "full" && !exp ? C.success + "55" : invS.level === "partial" && !exp ? "#fbbf2455" : exp ? C.accent + "44" : C.border }} onClick={() => setExpanded(exp ? null : o.id)}>
-            {invS.level === "full" && <div style={{ background: C.successBg, color: C.success, fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 8, marginBottom: 8, display: "inline-block", border: `1px solid ${C.success}33` }}>📦 IMA SVE U POPISU — spremno za slanje</div>}
+            {invS.level === "full" && <div style={{ background: C.successBg, color: C.success, fontSize: 13, fontWeight: 700, padding: "4px 10px", borderRadius: 8, marginBottom: 8, display: "inline-block", border: `1px solid ${C.success}33` }}>📦 IMA SVE U POPISU — spremno za slanje</div>}
             {invS.level === "partial" && (
-              <div style={{ background: "rgba(251,191,36,0.12)", color: "#fbbf24", fontSize: 11, fontWeight: 700, padding: "6px 10px", borderRadius: 8, marginBottom: 8, border: `1px solid #fbbf2444`, lineHeight: 1.5 }}>
+              <div style={{ background: "rgba(251,191,36,0.12)", color: "#fbbf24", fontSize: 13, fontWeight: 700, padding: "6px 10px", borderRadius: 8, marginBottom: 8, border: `1px solid #fbbf2444`, lineHeight: 1.5 }}>
                 ⚠️ DELIMIČNO U POPISU
                 <div style={{ fontWeight: 500, marginTop: 3, color: C.text }}>
                   {invS.hits.map((h, i) => <span key={"h"+i} style={{ marginRight: 8, color: C.success }}>✅ {h.name} {h.size}</span>)}
@@ -608,30 +631,30 @@ function OrdersPage({ data, setData, user, log }) {
               </div>
             )}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-              <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 700, fontSize: 18 }}>{o.name}</div><div style={{ fontSize: 15, color: C.dim, marginTop: 2 }}>{o.model || "—"}</div>{o.idBroj && <div style={{ fontSize: 13, color: C.purple, fontWeight: 700, marginTop: 3 }}>ID: {o.idBroj}</div>}</div>
+              <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 700, fontSize: 20 }}>{o.name}</div><div style={{ fontSize: 17, color: C.dim, marginTop: 2 }}>{o.model || "—"}</div>{o.idBroj && <div style={{ fontSize: 15, color: C.purple, fontWeight: 700, marginTop: 3 }}>ID: {o.idBroj}</div>}</div>
               <span style={S.badge(st.color, st.bg)}>{st.icon} {st.label}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontSize: 12, color: C.dim }}>{o.assignedTo || "—"} • {fd(o.dateCreated)}{o.pxBroj && <span style={{ color: C.accent }}> • PX:{o.pxBroj}</span>}</div>
-              <div style={{ fontWeight: 800, fontFamily: FM, color: C.accent, fontSize: 14 }}>{fm(o.codAmount)}</div>
+              <div style={{ fontSize: 14, color: C.dim }}>{o.assignedTo || "—"} • {fd(o.dateCreated)}{o.pxBroj && <span style={{ color: C.accent }}> • PX:{o.pxBroj}</span>}</div>
+              <div style={{ fontWeight: 800, fontFamily: FM, color: C.accent, fontSize: 16 }}>{fm(o.codAmount)}</div>
             </div>
             {exp && (
               <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12, marginBottom: 12 }}>
-                  <div style={{ fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Tel:</span> <span style={{ fontWeight: 600 }}>{o.phone || "—"}</span></div>
-                  <div style={{ fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Mesto:</span> <span style={{ fontWeight: 600 }}>{o.city || "—"}</span></div>
-                  <div style={{ gridColumn: "1/-1", fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Adresa:</span> <span style={{ fontWeight: 600 }}>{o.address || "—"}</span></div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 14, marginBottom: 12 }}>
+                  <div style={{ fontSize: 17 }}><span style={{ color: C.dim, fontSize: 14 }}>Tel:</span> <span style={{ fontWeight: 600 }}>{o.phone || "—"}</span></div>
+                  <div style={{ fontSize: 17 }}><span style={{ color: C.dim, fontSize: 14 }}>Mesto:</span> <span style={{ fontWeight: 600 }}>{o.city || "—"}</span></div>
+                  <div style={{ gridColumn: "1/-1", fontSize: 17 }}><span style={{ color: C.dim, fontSize: 14 }}>Adresa:</span> <span style={{ fontWeight: 600 }}>{o.address || "—"}</span></div>
                   <div><span style={{ color: C.dim }}>ID:</span> <span style={{ color: C.purple, fontWeight: 600 }}>{o.idBroj || "—"}</span></div>
                   <div><span style={{ color: C.dim }}>PX:</span> {o.pxBroj ? <a href={trackUrl(o.pxBroj)} target="_blank" rel="noopener noreferrer" style={{ color: C.accent, fontWeight: 600, textDecoration: "underline", textDecorationStyle: "dotted" }} onClick={e => e.stopPropagation()}>{o.pxBroj}</a> : <span style={{ color: C.dim }}>—</span>}</div>
                   {o.dateDelivered && <div><span style={{ color: C.dim }}>Isporučeno:</span> {fd(o.dateDelivered)}</div>}
                   {o.status === "odbijeno" && <div><span style={{ color: C.dim }}>Retur:</span> <span style={{ color: C.danger }}>{fm(o.returPostarina)}</span></div>}
                   {o.note && <div style={{ gridColumn: "1/-1" }}><span style={{ color: C.dim }}>Napomena:</span> {o.note}</div>}
                 </div>
-                {acts.length > 0 && <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>{acts.map((a, i) => <button key={i} onClick={a.fn} style={{ ...S.btnS, color: a.color, background: a.color + "18", border: `1px solid ${a.color}33`, padding: "8px 13px", fontSize: 13 }}>{a.label}</button>)}</div>}
+                {acts.length > 0 && <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>{acts.map((a, i) => <button key={i} onClick={a.fn} style={{ ...S.btnS, color: a.color, background: a.color + "18", border: `1px solid ${a.color}33`, padding: "8px 13px", fontSize: 15 }}>{a.label}</button>)}</div>}
                 {isA && <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  <button onClick={() => setEditModal(o)} style={{ ...S.btn2, flex: "1 1 calc(50% - 3px)", fontSize: 12 }}>✏️ Izmeni</button>
-                  <button onClick={() => openStatusModal(o)} style={{ ...S.btn2, flex: "1 1 calc(50% - 3px)", fontSize: 12 }}>🔄 Status</button>
-                  <button onClick={() => deleteO(o)} style={{ ...S.btnD, flex: "1 1 100%", fontSize: 12, justifyContent: "center" }}><Ic d={I.trash} size={14} color={C.danger} /> Obriši porudžbinu</button>
+                  <button onClick={() => setEditModal(o)} style={{ ...S.btn2, flex: "1 1 calc(50% - 3px)", fontSize: 14 }}>✏️ Izmeni</button>
+                  <button onClick={() => openStatusModal(o)} style={{ ...S.btn2, flex: "1 1 calc(50% - 3px)", fontSize: 14 }}>🔄 Status</button>
+                  <button onClick={() => deleteO(o)} style={{ ...S.btnD, flex: "1 1 100%", fontSize: 14, justifyContent: "center" }}><Ic d={I.trash} size={14} color={C.danger} /> Obriši porudžbinu</button>
                 </div>}
               </div>
             )}
@@ -643,9 +666,9 @@ function OrdersPage({ data, setData, user, log }) {
       {/* New Order */}
       {showNew && <Modal title="➕ Nova porudžbina" onClose={() => setShowNew(false)}>
         <div style={{ background: C.accentBg, border: `1px solid ${C.accent}33`, borderRadius: 12, padding: 14, marginBottom: 16 }}>
-          <div style={{ ...S.lb, color: C.accent, marginBottom: 8 }}>⚡ BRZO LEPLJENJE</div>
-          <textarea style={{ ...S.ta, minHeight: 75, fontSize: 13, background: C.s1 }} value={paste} onChange={e => setPaste(e.target.value)} placeholder={"Predrag Ristic\nCara Lazara 12\nBeograd\n065555555"} />
-          <button onClick={parsePaste} style={{ ...S.btn, marginTop: 8, padding: "9px 16px", fontSize: 13, width: "100%" }}>📋 Popuni polja</button>
+          <div style={{ ...S.lb, color: C.accent, marginBottom: 8, fontSize: 15 }}>⚡ BRZO LEPLJENJE</div>
+          <textarea style={{ ...S.ta, minHeight: 110, fontSize: 18, background: C.s1, lineHeight: 1.5 }} value={paste} onChange={e => setPaste(e.target.value)} placeholder={"Predrag Ristic\nCara Lazara 12\nBeograd\n065555555"} />
+          <button onClick={parsePaste} style={{ ...S.btn, marginTop: 8, padding: "11px 16px", fontSize: 17, width: "100%" }}>📋 Popuni polja</button>
         </div>
         <Fl label="Ime i prezime *"><input style={S.inp} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Ime Prezime" /></Fl>
         <Fl label="Adresa"><input style={S.inp} value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} placeholder="Ulica i broj" /></Fl>
@@ -653,69 +676,87 @@ function OrdersPage({ data, setData, user, log }) {
         <Fl label="Otkupni iznos (RSD) *"><input style={S.inp} type="number" value={form.codAmount} onChange={e => setForm({ ...form, codAmount: e.target.value })} placeholder="3500" /></Fl>
         {form.models.map((m, idx) => (
           <div key={idx} style={{ background: idx > 0 ? C.s2 : "transparent", borderRadius: 10, padding: idx > 0 ? 12 : 0, marginBottom: 10, border: idx > 0 ? `1px solid ${C.border}` : "none" }}>
-            {idx > 0 && <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 12, fontWeight: 700, color: C.accent }}>Patika #{idx + 1}</span><button onClick={() => rmModelSlot(idx)} style={{ ...S.btnS, background: C.dangerBg, color: C.danger, border: "none", padding: "3px 8px", fontSize: 11 }}>✕</button></div>}
+            {idx > 0 && <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Patika #{idx + 1}</span><button onClick={() => rmModelSlot(idx)} style={{ ...S.btnS, background: C.dangerBg, color: C.danger, border: "none", padding: "3px 8px", fontSize: 13 }}>✕</button></div>}
             <Fl label={idx === 0 ? "Model patika" : "Model"}>
               <select style={S.sel} value={m.model} onChange={e => upModel(idx, "model", e.target.value)}><option value="">— Izaberi —</option>{data.models.map(md => <option key={md.id} value={md.name}>{md.name}</option>)}<option value="__custom">✏️ Ručno</option></select>
             </Fl>
             {m.model === "__custom" && <Fl label="Naziv"><input style={S.inp} value={m.custom} onChange={e => upModel(idx, "custom", e.target.value)} placeholder="Naziv..." /></Fl>}
-            <Fl label="Broj patika"><input style={S.inp} value={m.size} onChange={e => upModel(idx, "size", e.target.value)} placeholder="42" /></Fl>
+            <Fl label="Broj patika">
+              <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }}>
+                {["40", "41", "42", "43", "44", "45"].map(sz => (
+                  <button key={sz} onClick={() => upModel(idx, "size", sz)} style={{
+                    flex: "1 1 calc(16.66% - 5px)",
+                    padding: "11px 0",
+                    fontSize: 17,
+                    fontWeight: 800,
+                    borderRadius: 10,
+                    border: m.size === sz ? `2px solid ${C.accent}` : `1px solid ${C.border}`,
+                    background: m.size === sz ? C.accentBg : C.s2,
+                    color: m.size === sz ? C.accent : C.text,
+                    cursor: "pointer",
+                    fontFamily: F,
+                  }}>{sz}</button>
+                ))}
+              </div>
+              <input style={S.inp} value={m.size} onChange={e => upModel(idx, "size", e.target.value)} placeholder="Ručno ukucaj broj (npr. 38, 46...)" />
+            </Fl>
           </div>
         ))}
-        <button onClick={addModelSlot} style={{ ...S.btn2, width: "100%", marginBottom: 12, fontSize: 13, color: C.accent, borderColor: C.accent + "44" }}>➕ Dodaj još pari patika</button>
+        <button onClick={addModelSlot} style={{ ...S.btn2, width: "100%", marginBottom: 12, fontSize: 15, color: C.accent, borderColor: C.accent + "44" }}>➕ Dodaj još pari patika</button>
         <Fl label="Napomena"><input style={S.inp} value={form.note} onChange={e => setForm({ ...form, note: e.target.value })} placeholder="Info..." /></Fl>
-        <button onClick={addOrder} style={{ ...S.btn, width: "100%", marginTop: 4, padding: "13px", fontSize: 15 }}>Dodaj porudžbinu</button>
+        <button onClick={addOrder} style={{ ...S.btn, width: "100%", marginTop: 4, padding: "13px", fontSize: 17 }}>Dodaj porudžbinu</button>
       </Modal>}
 
       {idModal && <Modal title="📋 Unesi ID broj" onClose={() => setIdModal(null)}>
-        <div style={{ ...S.card, background: C.s2, marginBottom: 14 }}><div style={{ fontWeight: 700 }}>{idModal.name}</div><div style={{ fontSize: 13, color: C.dim }}>{idModal.model} • {fm(idModal.codAmount)}</div></div>
-        {user.role === "worker" && <div style={{ background: C.infoBg, borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 13 }}>Dodeljuje se tebi — <strong>{user.username}</strong></div>}
+        <div style={{ ...S.card, background: C.s2, marginBottom: 14 }}><div style={{ fontWeight: 700 }}>{idModal.name}</div><div style={{ fontSize: 15, color: C.dim }}>{idModal.model} • {fm(idModal.codAmount)}</div></div>
+        {user.role === "worker" && <div style={{ background: C.infoBg, borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 15 }}>Dodeljuje se tebi — <strong>{user.username}</strong></div>}
         <Fl label="ID broj *"><input style={S.inp} value={idVal} onChange={e => setIdVal(e.target.value)} placeholder="ID broj..." autoFocus /></Fl>
         {hasInInventory(idModal) && (
           <label style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer", padding: 13, background: C.successBg, borderRadius: 10, border: `1px solid ${C.success}44`, marginBottom: 14 }}>
             <input type="checkbox" checked={fromInv} onChange={e => setFromInv(e.target.checked)} style={{ width: 20, height: 20, accentColor: C.success, cursor: "pointer", flexShrink: 0 }} />
-            <div style={{ fontSize: 13 }}>
+            <div style={{ fontSize: 15 }}>
               <div style={{ fontWeight: 700, color: C.success }}>📦 Ide iz popisa</div>
-              <div style={{ fontSize: 12, color: C.dim, marginTop: 2 }}>Automatski će umanjiti količinu u popisu za 1 po paru</div>
+              <div style={{ fontSize: 14, color: C.dim, marginTop: 2 }}>Automatski će umanjiti količinu u popisu za 1 po paru</div>
             </div>
           </label>
         )}
         {isA && <Fl label="Radnik"><select style={S.sel} defaultValue="Filip"><option value="Filip">Filip</option><option value="Mirela">Mirela</option></select></Fl>}
-        <button onClick={() => wrapAction("ID " + idVal, saveId)} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 15 }}>Potvrdi</button>
+        <button onClick={() => wrapAction("ID " + idVal, saveId)} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 17 }}>Potvrdi</button>
       </Modal>}
 
       {pxModal && <Modal title="📮 Pošalji porudžbinu i dodaj PX broj" onClose={() => setPxModal(null)}>
-        <div style={{ ...S.card, background: C.s2, marginBottom: 14 }}><div style={{ fontWeight: 700 }}>{pxModal.name}</div><div style={{ fontSize: 13, color: C.dim }}>ID: <span style={{ color: C.purple }}>{pxModal.idBroj}</span> • {pxModal.assignedTo}</div></div>
-        <div style={{ background: C.accentBg, borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 13, border: `1px solid ${C.accent}33` }}>⚠️ <strong>{pxModal.assignedTo}</strong> se zadužuje za <strong>{fm(pxModal.codAmount)}</strong></div>
+        <div style={{ ...S.card, background: C.s2, marginBottom: 14 }}><div style={{ fontWeight: 700 }}>{pxModal.name}</div><div style={{ fontSize: 15, color: C.dim }}>ID: <span style={{ color: C.purple }}>{pxModal.idBroj}</span> • {pxModal.assignedTo}</div></div>
+        <div style={{ background: C.accentBg, borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 15, border: `1px solid ${C.accent}33` }}>⚠️ <strong>{pxModal.assignedTo}</strong> se zadužuje za <strong>{fm(pxModal.codAmount)}</strong></div>
         <Fl label="PX broj *"><input style={S.inp} value={pxVal} onChange={e => setPxVal(e.target.value)} placeholder="RR123456789RS" autoFocus /></Fl>
-        <button onClick={() => wrapAction("PX " + pxVal, savePx)} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 15 }}>Potvrdi PX</button>
+        <button onClick={() => wrapAction("PX " + pxVal, savePx)} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 17 }}>Potvrdi PX</button>
       </Modal>}
 
       {returModal && <Modal title="❌ Odbijeno" onClose={() => setReturModal(null)}>
-        <div style={{ ...S.card, background: C.s2, marginBottom: 14 }}><div style={{ fontWeight: 700 }}>{returModal.name}</div><div style={{ fontSize: 13, color: C.dim }}>PX: {returModal.pxBroj || "—"} • {returModal.assignedTo} • {fm(returModal.codAmount)}</div></div>
-        <div style={{ background: C.dangerBg, borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 13 }}>Otkupnina {fm(returModal.codAmount)} biće oduzeta iz zaduženja za {returModal.assignedTo}.</div>
+        <div style={{ ...S.card, background: C.s2, marginBottom: 14 }}><div style={{ fontWeight: 700 }}>{returModal.name}</div><div style={{ fontSize: 15, color: C.dim }}>PX: {returModal.pxBroj || "—"} • {returModal.assignedTo} • {fm(returModal.codAmount)}</div></div>
+        <div style={{ background: C.dangerBg, borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 15 }}>Otkupnina {fm(returModal.codAmount)} biće oduzeta iz zaduženja za {returModal.assignedTo}.</div>
         <Fl label="Retur poštarina (RSD)"><input style={S.inp} type="number" value={returVal} onChange={e => setReturVal(e.target.value)} placeholder="0" autoFocus /></Fl>
-        <button onClick={() => wrapAction("Odbijeno " + returModal.name, saveRetur)} style={{ ...S.btnD, width: "100%", padding: "13px", fontSize: 15, background: C.danger, color: "#fff", border: "none" }}>Označi odbijeno</button>
+        <button onClick={() => wrapAction("Odbijeno " + returModal.name, saveRetur)} style={{ ...S.btnD, width: "100%", padding: "13px", fontSize: 17, background: C.danger, color: "#fff", border: "none" }}>Označi odbijeno</button>
       </Modal>}
 
       {statusModal && <Modal title="🔄 Promeni status" onClose={() => setStatusModal(null)}>
-        <div style={{ ...S.card, background: C.s2, marginBottom: 14 }}><div style={{ fontWeight: 700 }}>{statusModal.name}</div><div style={{ fontSize: 13, color: C.dim }}>Trenutni: {ST[statusModal.status]?.label}</div></div>
+        <div style={{ ...S.card, background: C.s2, marginBottom: 14 }}><div style={{ fontWeight: 700 }}>{statusModal.name}</div><div style={{ fontSize: 15, color: C.dim }}>Trenutni: {ST[statusModal.status]?.label}</div></div>
         <Fl label="Novi status">
           <select style={S.sel} value={newSt} onChange={e => setNewSt(e.target.value)}>{Object.entries(ST).map(([k, v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}</select>
         </Fl>
-        <button onClick={saveStatus} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 15 }}>Sačuvaj status</button>
+        <button onClick={saveStatus} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 17 }}>Sačuvaj status</button>
       </Modal>}
 
       {editModal && <EditOrderModal order={editModal} data={data} setData={setData} log={log} onClose={() => setEditModal(null)} />}
 
       {bulkNedja && <Modal title="🚐 Pošalji po Nedji" onClose={() => setBulkNedja(false)}>
-        <div style={{ fontSize: 13, color: C.dim, marginBottom: 14 }}>Označi pošiljke. Uneto: {unetoOrders.length}</div>
-        <button onClick={() => setBulkSel(bulkSel.length === unetoOrders.length ? [] : unetoOrders.map(o => o.id))} style={{ ...S.btn2, width: "100%", marginBottom: 12, fontSize: 13 }}>{bulkSel.length === unetoOrders.length ? "Odselektuj" : "Selektuj sve"}</button>
+        <div style={{ fontSize: 15, color: C.dim, marginBottom: 14 }}>Označi pošiljke. Uneto: {unetoOrders.length}</div>
+        <button onClick={() => setBulkSel(bulkSel.length === unetoOrders.length ? [] : unetoOrders.map(o => o.id))} style={{ ...S.btn2, width: "100%", marginBottom: 12, fontSize: 15 }}>{bulkSel.length === unetoOrders.length ? "Odselektuj" : "Selektuj sve"}</button>
         <div style={{ maxHeight: 350, overflowY: "auto" }}>{unetoOrders.map(o => (
           <div key={o.id} onClick={() => setBulkSel(s => s.includes(o.id) ? s.filter(x => x !== o.id) : [...s, o.id])} style={{ ...S.card, cursor: "pointer", borderColor: bulkSel.includes(o.id) ? C.accent : C.border, background: bulkSel.includes(o.id) ? C.accentBg : C.s1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div><div style={{ fontWeight: 700, fontSize: 14 }}>{o.name}</div><div style={{ fontSize: 12, color: C.dim }}>{o.model} • {o.assignedTo}</div></div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontFamily: FM, fontWeight: 700, color: C.accent, fontSize: 13 }}>{fm(o.codAmount)}</span><div style={{ width: 22, height: 22, borderRadius: 6, border: `2px solid ${bulkSel.includes(o.id) ? C.accent : C.border}`, background: bulkSel.includes(o.id) ? C.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>{bulkSel.includes(o.id) && <Ic d={I.check} size={14} color="#000" />}</div></div>
+            <div><div style={{ fontWeight: 700, fontSize: 16 }}>{o.name}</div><div style={{ fontSize: 14, color: C.dim }}>{o.model} • {o.assignedTo}</div></div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontFamily: FM, fontWeight: 700, color: C.accent, fontSize: 15 }}>{fm(o.codAmount)}</span><div style={{ width: 22, height: 22, borderRadius: 6, border: `2px solid ${bulkSel.includes(o.id) ? C.accent : C.border}`, background: bulkSel.includes(o.id) ? C.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>{bulkSel.includes(o.id) && <Ic d={I.check} size={14} color="#000" />}</div></div>
           </div>))}</div>
-        {bulkSel.length > 0 && <button onClick={sendBulk} style={{ ...S.btn, width: "100%", marginTop: 12, padding: "13px", fontSize: 15 }}>🚐 Pošalji {bulkSel.length}</button>}
+        {bulkSel.length > 0 && <button onClick={sendBulk} style={{ ...S.btn, width: "100%", marginTop: 12, padding: "13px", fontSize: 17 }}>🚐 Pošalji {bulkSel.length}</button>}
       </Modal>}
     </div>
   );
@@ -761,25 +802,25 @@ function FinancesPage({ data, setData, user, log }) {
       <div style={{ ...S.card, borderColor: exp ? C.accent + "44" : C.border }}>
         <div onClick={() => setExpandedW(exp ? null : name)} style={{ cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontSize: 17, fontWeight: 800 }}>{name === "Filip" ? "👨‍💼" : "👩‍💼"} {name}</span>
-            <span style={{ fontSize: 12, color: C.dim, fontWeight: 500 }}>({s.sentCount} pošiljki)</span>
+            <span style={{ fontSize: 19, fontWeight: 800 }}>{name === "Filip" ? "👨‍💼" : "👩‍💼"} {name}</span>
+            <span style={{ fontSize: 14, color: C.dim, fontWeight: 500 }}>({s.sentCount} pošiljki)</span>
           </div>
-          <span style={{ fontSize: 11, color: C.dim }}>{exp ? "▲" : "▼"}</span>
+          <span style={{ fontSize: 13, color: C.dim }}>{exp ? "▲" : "▼"}</span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-          <div style={S.stat}><div style={S.stL}>Ukupno poslato</div><div style={{ ...S.stV, fontSize: 15, color: C.info }}>{fm(s.totalSent)}</div></div>
-          <div style={S.stat}><div style={S.stL}>Isporučeno</div><div style={{ ...S.stV, fontSize: 15, color: C.success }}>{fm(s.totalDel)}</div></div>
-          <div style={S.stat}><div style={S.stL}>Uplaćeno</div><div style={{ ...S.stV, fontSize: 15, color: C.accent }}>{fm(s.totalPaid)}</div></div>
-          <div style={{ ...S.stat, background: s.debt > 0 ? C.dangerBg : C.successBg }}><div style={S.stL}>Trenutni dug</div><div style={{ ...S.stV, fontSize: 15, color: s.debt > 0 ? C.danger : C.success }}>{fm(s.debt)}</div></div>
+          <div style={S.stat}><div style={S.stL}>Ukupno poslato</div><div style={{ ...S.stV, fontSize: 17, color: C.info }}>{fm(s.totalSent)}</div></div>
+          <div style={S.stat}><div style={S.stL}>Isporučeno</div><div style={{ ...S.stV, fontSize: 17, color: C.success }}>{fm(s.totalDel)}</div></div>
+          <div style={S.stat}><div style={S.stL}>Uplaćeno</div><div style={{ ...S.stV, fontSize: 17, color: C.accent }}>{fm(s.totalPaid)}</div></div>
+          <div style={{ ...S.stat, background: s.debt > 0 ? C.dangerBg : C.successBg }}><div style={S.stL}>Trenutni dug</div><div style={{ ...S.stV, fontSize: 17, color: s.debt > 0 ? C.danger : C.success }}>{fm(s.debt)}</div></div>
         </div>
-        {s.totalRet > 0 && <div style={{ ...S.stat, marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}><span style={{ ...S.stL, margin: 0 }}>Retur poštarina</span><span style={{ fontWeight: 800, fontFamily: FM, fontSize: 14, color: C.danger }}>{fm(s.totalRet)}</span></div>}
+        {s.totalRet > 0 && <div style={{ ...S.stat, marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}><span style={{ ...S.stL, margin: 0 }}>Retur poštarina</span><span style={{ fontWeight: 800, fontFamily: FM, fontSize: 16, color: C.danger }}>{fm(s.totalRet)}</span></div>}
         {exp && (
           <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Zapisi ({recs.length})</div>
-            {recs.length === 0 && <div style={{ fontSize: 13, color: C.dim }}>Nema zapisa</div>}
+            <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 10 }}>Zapisi ({recs.length})</div>
+            {recs.length === 0 && <div style={{ fontSize: 15, color: C.dim }}>Nema zapisa</div>}
             {pagedRecs.map(r => { const ft = FT[r.type] || FT.ostalo; return (
               <div key={r.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
-                <div style={{ flex: 1, minWidth: 0 }}><div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}><span style={S.badge(ft.color, ft.color + "20")}>{ft.label}</span><span style={{ fontWeight: 700, fontFamily: FM, color: ft.color, fontSize: 14 }}>{fm(r.amount)}</span></div><div style={{ fontSize: 11, color: C.dim, marginTop: 3 }}>{fd(r.date)}{r.note ? ` • ${r.note}` : ""}</div></div>
+                <div style={{ flex: 1, minWidth: 0 }}><div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}><span style={S.badge(ft.color, ft.color + "20")}>{ft.label}</span><span style={{ fontWeight: 700, fontFamily: FM, color: ft.color, fontSize: 16 }}>{fm(r.amount)}</span></div><div style={{ fontSize: 13, color: C.dim, marginTop: 3 }}>{fd(r.date)}{r.note ? ` • ${r.note}` : ""}</div></div>
                 {isA && <button onClick={() => delFin(r)} style={{ ...S.btnD, padding: "5px 7px", marginLeft: 6, flexShrink: 0 }}><Ic d={I.trash} size={13} color={C.danger} /></button>}
               </div>); })}
             <Pager page={rp} total={recs.length} setPage={p => setRecPages(prev => ({ ...prev, [name]: p }))} />
@@ -792,7 +833,7 @@ function FinancesPage({ data, setData, user, log }) {
   const f = calc("Filip"), m = calc("Mirela"); const td = f.debt + m.debt;
   return (
     <div style={{ padding: "14px 14px 20px" }}>
-      <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, border: `1px solid ${td > 0 ? C.danger + "33" : C.success + "33"}`, background: td > 0 ? C.dangerBg : C.successBg, borderRadius: 14, padding: 14 }}><div style={S.stL}>Ukupan dug</div><div style={{ ...S.stV, fontSize: 26, color: td > 0 ? C.danger : C.success }}>{fm(td)}</div></div>
+      <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, border: `1px solid ${td > 0 ? C.danger + "33" : C.success + "33"}`, background: td > 0 ? C.dangerBg : C.successBg, borderRadius: 14, padding: 14 }}><div style={S.stL}>Ukupan dug</div><div style={{ ...S.stV, fontSize: 28, color: td > 0 ? C.danger : C.success }}>{fm(td)}</div></div>
       {isA && <button onClick={() => setShowAdd(true)} style={{ ...S.btn, width: "100%", marginBottom: 14, padding: "12px" }}><Ic d={I.plus} size={16} color="#000" /> Dodaj zapis</button>}
       <WS name="Filip" /><WS name="Mirela" />
       {showAdd && <Modal title="💰 Dodaj zapis" onClose={() => setShowAdd(false)}>
@@ -801,7 +842,7 @@ function FinancesPage({ data, setData, user, log }) {
         <Fl label="Iznos (RSD) *"><input style={S.inp} type="number" value={fAmount} onChange={e => setFAmount(e.target.value)} placeholder="20000" /></Fl>
         <Fl label="Datum"><input style={S.inp} type="date" value={fDate} onChange={e => setFDate(e.target.value)} /></Fl>
         <Fl label="Napomena"><input style={S.inp} value={fNote} onChange={e => setFNote(e.target.value)} placeholder="Uplata na račun..." /></Fl>
-        <button onClick={addFin} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 15 }}>Dodaj</button>
+        <button onClick={addFin} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 17 }}>Dodaj</button>
       </Modal>}
     </div>
   );
@@ -819,14 +860,14 @@ function ArchivePage({ data, setData, user, log }) {
 
   return (
     <div style={{ padding: "14px 14px 20px" }}>
-      <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid ${C.border}`, padding: 14 }}><div style={S.stL}>Arhiva</div><div style={{ ...S.stV, fontSize: 26, color: C.dim }}>{archived.length}</div></div>
-      <div style={{ position: "relative", marginBottom: 14 }}><input style={{ ...S.inp, paddingLeft: 36, fontSize: 13 }} value={search} onChange={e => { setSearch(e.target.value); setPg(0); }} placeholder="Pretraži..." /><div style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)" }}><Ic d={I.search} size={16} color={C.dim} /></div></div>
+      <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid ${C.border}`, padding: 14 }}><div style={S.stL}>Arhiva</div><div style={{ ...S.stV, fontSize: 28, color: C.dim }}>{archived.length}</div></div>
+      <div style={{ position: "relative", marginBottom: 14 }}><input style={{ ...S.inp, paddingLeft: 36, fontSize: 15 }} value={search} onChange={e => { setSearch(e.target.value); setPg(0); }} placeholder="Pretraži..." /><div style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)" }}><Ic d={I.search} size={16} color={C.dim} /></div></div>
       {paged.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}>📁 Prazno</div>}
       {paged.map(o => { const st = getDispSt(o); const exp = expanded === o.id; return (
         <div key={o.id} style={{ ...S.card, opacity: 0.85, cursor: "pointer" }} onClick={() => setExpanded(exp ? null : o.id)}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}><div><div style={{ fontWeight: 700, fontSize: 14 }}>{o.name}</div><div style={{ fontSize: 12, color: C.dim }}>{o.model}</div></div><span style={S.badge(st.color, st.bg)}>{st.icon} {st.label}</span></div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: C.dim }}><span>{o.assignedTo} • {fd(o.dateCreated)}</span><span style={{ fontWeight: 800, fontFamily: FM, color: C.accent }}>{fm(o.codAmount)}</span></div>
-          {exp && <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}><button onClick={() => unarch(o)} style={{ ...S.btn2, width: "100%", fontSize: 12 }}>↩️ Vrati</button></div>}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}><div><div style={{ fontWeight: 700, fontSize: 16 }}>{o.name}</div><div style={{ fontSize: 14, color: C.dim }}>{o.model}</div></div><span style={S.badge(st.color, st.bg)}>{st.icon} {st.label}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: C.dim }}><span>{o.assignedTo} • {fd(o.dateCreated)}</span><span style={{ fontWeight: 800, fontFamily: FM, color: C.accent }}>{fm(o.codAmount)}</span></div>
+          {exp && <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}><button onClick={() => unarch(o)} style={{ ...S.btn2, width: "100%", fontSize: 14 }}>↩️ Vrati</button></div>}
         </div>); })}
       <Pager page={pg} total={filtered.length} setPage={setPg} />
     </div>
@@ -884,45 +925,45 @@ function InventoryPage({ data, setData, user, log }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
         <div style={{ ...S.stat, textAlign: "center", borderRadius: 14, border: `1px solid ${C.border}`, padding: 14 }}>
           <div style={S.stL}>Ukupno kom.</div>
-          <div style={{ ...S.stV, fontSize: 24, color: C.accent }}>{tot}</div>
+          <div style={{ ...S.stV, fontSize: 26, color: C.accent }}>{tot}</div>
         </div>
         <div style={{ ...S.stat, textAlign: "center", borderRadius: 14, border: `1px solid ${C.border}`, padding: 14 }}>
           <div style={S.stL}>Modela</div>
-          <div style={{ ...S.stV, fontSize: 24, color: C.info }}>{modelCount}</div>
+          <div style={{ ...S.stV, fontSize: 26, color: C.info }}>{modelCount}</div>
         </div>
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
         <div style={{ flex: 1, position: "relative" }}>
-          <input style={{ ...S.inp, paddingLeft: 36, fontSize: 13 }} value={search} onChange={e => setSearch(e.target.value)} placeholder="Pretraži model ili veličinu..." />
+          <input style={{ ...S.inp, paddingLeft: 36, fontSize: 15 }} value={search} onChange={e => setSearch(e.target.value)} placeholder="Pretraži model ili veličinu..." />
           <div style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)" }}><Ic d={I.search} size={16} color={C.dim} /></div>
         </div>
         {isA && <button onClick={() => { setForm(ef); setEditItem(null); setShowAdd(true); }} style={{ ...S.btn, padding: "10px 14px" }}><Ic d={I.plus} size={16} color="#000" /></button>}
       </div>
 
-      {!isA && <div style={{ fontSize: 12, color: C.dim, textAlign: "center", marginBottom: 12, padding: "8px", background: C.s2, borderRadius: 8 }}>👁️ Pregled popisa — izmene može raditi samo administrator</div>}
+      {!isA && <div style={{ fontSize: 14, color: C.dim, textAlign: "center", marginBottom: 12, padding: "8px", background: C.s2, borderRadius: 8 }}>👁️ Pregled popisa — izmene može raditi samo administrator</div>}
 
-      {Object.keys(groupedFiltered).length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}><div style={{ fontSize: 32, marginBottom: 6 }}>👟</div>Popis je prazan</div>}
+      {Object.keys(groupedFiltered).length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}><div style={{ fontSize: 34, marginBottom: 6 }}>👟</div>Popis je prazan</div>}
 
       {Object.entries(groupedFiltered).sort((a, b) => a[0].localeCompare(b[0])).map(([name, items]) => {
         const groupTotal = items.reduce((s, it) => s + (parseInt(it.quantity) || 0), 0);
         return (
           <div key={name} style={S.card}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>
-              <div style={{ fontWeight: 800, fontSize: 16 }}>👟 {name}</div>
-              <span style={{ ...S.badge(C.accent, C.accentBg), fontSize: 12 }}>{groupTotal} kom.</span>
+              <div style={{ fontWeight: 800, fontSize: 18 }}>👟 {name}</div>
+              <span style={{ ...S.badge(C.accent, C.accentBg), fontSize: 14 }}>{groupTotal} kom.</span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", gap: "6px 12px", alignItems: "center" }}>
               {items.map(it => {
                 const qty = parseInt(it.quantity) || 0;
                 return (
                   <div key={it.id} style={{ display: "contents" }}>
-                    <div style={{ fontFamily: FM, fontWeight: 700, fontSize: 14, color: C.dim, minWidth: 32 }}>{it.size || "—"}</div>
+                    <div style={{ fontFamily: FM, fontWeight: 700, fontSize: 16, color: C.dim, minWidth: 32 }}>{it.size || "—"}</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ height: 6, flex: 1, background: C.s2, borderRadius: 3, overflow: "hidden", maxWidth: 100 }}>
                         <div style={{ height: "100%", width: `${Math.min(100, qty * 20)}%`, background: qty > 0 ? C.accent : C.border, borderRadius: 3 }} />
                       </div>
-                      <span style={{ fontFamily: FM, fontWeight: 800, fontSize: 15, color: qty > 0 ? C.text : C.dim, minWidth: 22, textAlign: "right" }}>{qty}</span>
+                      <span style={{ fontFamily: FM, fontWeight: 800, fontSize: 17, color: qty > 0 ? C.text : C.dim, minWidth: 22, textAlign: "right" }}>{qty}</span>
                     </div>
                     <div style={{ display: "flex", gap: 3 }}>
                       {isA ? <>
@@ -936,7 +977,7 @@ function InventoryPage({ data, setData, user, log }) {
                 );
               })}
             </div>
-            {items.some(it => it.note) && <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${C.border}`, fontSize: 11, color: C.dim }}>
+            {items.some(it => it.note) && <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${C.border}`, fontSize: 13, color: C.dim }}>
               {items.filter(it => it.note).map(it => <div key={it.id}>📝 vel.{it.size}: {it.note}</div>)}
             </div>}
           </div>
@@ -952,7 +993,7 @@ function InventoryPage({ data, setData, user, log }) {
           <Fl label="Količina"><input style={S.inp} type="number" min="0" value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} /></Fl>
         </div>
         <Fl label="Napomena"><input style={S.inp} value={form.note} onChange={e => setForm({ ...form, note: e.target.value })} /></Fl>
-        <button onClick={saveIt} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 15 }}>{editItem ? "Sačuvaj" : "Dodaj"}</button>
+        <button onClick={saveIt} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 17 }}>{editItem ? "Sačuvaj" : "Dodaj"}</button>
       </Modal>}
     </div>
   );
@@ -972,9 +1013,9 @@ function NabavkaPage({ data, goBack }) {
       invRemaining[k] = (invRemaining[k] || 0) + (parseInt(it.quantity) || 0);
     });
 
-    // Sve porudžbine Za unos, od najstarije
+    // Sve porudžbine Za unos + Uneto u sistem (ali preskačemo one koje idu iz popisa)
     const zaUnos = (data.orders || [])
-      .filter(o => o.status === "novo" && !o.archived)
+      .filter(o => !o.archived && (o.status === "novo" || o.status === "uneto") && !o.fromInventory)
       .sort((a, b) => new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0));
 
     // Grupisano po modelu, redosled dodavanja sačuvan
@@ -1084,23 +1125,23 @@ function NabavkaPage({ data, goBack }) {
 
   return (
     <div style={{ padding: "14px 14px 20px" }}>
-      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Nazad</button>
+      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 15 }}>← Nazad</button>
 
       <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid #f59e0b33`, background: "rgba(245,158,11,0.08)", padding: 14 }}>
         <div style={S.stL}>🛍️ Ukupno za nabavku</div>
-        <div style={{ ...S.stV, fontSize: 28, color: "#f59e0b" }}>{spisak.total} pari</div>
-        <div style={{ fontSize: 11, color: C.dim, marginTop: 4 }}>Iz porudžbina "Za unos" koje nisu u popisu</div>
+        <div style={{ ...S.stV, fontSize: 30, color: "#f59e0b" }}>{spisak.total} pari</div>
+        <div style={{ fontSize: 13, color: C.dim, marginTop: 4 }}>Iz porudžbina "Za unos" koje nisu u popisu</div>
       </div>
 
       {spisak.total === 0 ? (
         <div style={{ textAlign: "center", padding: 40, color: C.dim, ...S.card }}>
           ✅ Nema porudžbina za nabavku<br/>
-          <span style={{ fontSize: 12 }}>Sve što je naručeno ili je već u popisu ili nije status "Za unos"</span>
+          <span style={{ fontSize: 14 }}>Sve što je naručeno ili je već u popisu ili nije status "Za unos"</span>
         </div>
       ) : (
         <>
-          <div style={{ ...S.card, padding: 18, marginBottom: 14, fontFamily: FM, fontSize: 14, lineHeight: 1.9 }}>
-            <div style={{ fontWeight: 700, fontSize: 13, color: C.dim, marginBottom: 10, fontFamily: F }}>📋 Pregled — sortirano od najstarije porudžbine</div>
+          <div style={{ ...S.card, padding: 18, marginBottom: 14, fontFamily: FM, fontSize: 16, lineHeight: 1.9 }}>
+            <div style={{ fontWeight: 700, fontSize: 15, color: C.dim, marginBottom: 10, fontFamily: F }}>📋 Pregled — sortirano od najstarije porudžbine</div>
             {spisak.order.map(model => (
               <div key={model} style={{ display: "flex", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
                 <span style={{ fontWeight: 800, minWidth: 130 }}>{model}</span>
@@ -1110,10 +1151,10 @@ function NabavkaPage({ data, goBack }) {
           </div>
 
           <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-            <button onClick={downloadJPG} style={{ ...S.btn, flex: 1, padding: "13px", fontSize: 14 }}>🖼️ Preuzmi JPG</button>
-            <button onClick={copyList} style={{ ...S.btn2, flex: 1, padding: "13px", fontSize: 14 }}>📋 Kopiraj tekst</button>
+            <button onClick={downloadJPG} style={{ ...S.btn, flex: 1, padding: "13px", fontSize: 16 }}>🖼️ Preuzmi JPG</button>
+            <button onClick={copyList} style={{ ...S.btn2, flex: 1, padding: "13px", fontSize: 16 }}>📋 Kopiraj tekst</button>
           </div>
-          <div style={{ fontSize: 11, color: C.dim, textAlign: "center", lineHeight: 1.5 }}>
+          <div style={{ fontSize: 13, color: C.dim, textAlign: "center", lineHeight: 1.5 }}>
             💡 Tip: "Kopiraj tekst" je zgodan za slanje preko Viber-a ili SMS-a
           </div>
         </>
@@ -1191,7 +1232,7 @@ function MorePage({ setPage, user, data }) {
     { id: "export", icon: "📱", l: "Export brojeva", d: "Viber marketing" },
     { id: "__excel", icon: "📊", l: "Excel izvoz", d: "Izvezi sve tabele u .xlsx", action: exportExcel },
   ] : [];
-  return <div style={{ padding: "14px 14px 20px" }}><div style={{ fontSize: 18, fontWeight: 800, marginBottom: 16 }}>⚙️ Više</div>{items.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}>Nema dodatnih opcija</div>}{items.map(it => <div key={it.id} onClick={() => it.action ? it.action() : setPage(it.id)} style={{ ...S.card, cursor: "pointer", display: "flex", alignItems: "center", gap: 14, borderColor: it.id === "urgentno" && it.badge > 0 ? C.danger + "55" : C.border }}><div style={{ fontSize: 28 }}>{it.icon}</div><div style={{ flex: 1 }}><div style={{ fontWeight: 700, fontSize: 15 }}>{it.l}</div><div style={{ fontSize: 12, color: C.dim }}>{it.d}</div></div>{it.badge > 0 && <span style={{ ...S.badge(C.danger, C.dangerBg), fontSize: 13, fontWeight: 800, padding: "4px 12px" }}>{it.badge}</span>}</div>)}</div>;
+  return <div style={{ padding: "14px 14px 20px" }}><div style={{ fontSize: 20, fontWeight: 800, marginBottom: 16 }}>⚙️ Više</div>{items.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}>Nema dodatnih opcija</div>}{items.map(it => <div key={it.id} onClick={() => it.action ? it.action() : setPage(it.id)} style={{ ...S.card, cursor: "pointer", display: "flex", alignItems: "center", gap: 14, borderColor: it.id === "urgentno" && it.badge > 0 ? C.danger + "55" : C.border }}><div style={{ fontSize: 30 }}>{it.icon}</div><div style={{ flex: 1 }}><div style={{ fontWeight: 700, fontSize: 17 }}>{it.l}</div><div style={{ fontSize: 14, color: C.dim }}>{it.d}</div></div>{it.badge > 0 && <span style={{ ...S.badge(C.danger, C.dangerBg), fontSize: 15, fontWeight: 800, padding: "4px 12px" }}>{it.badge}</span>}</div>)}</div>;
 }
 
 function ModelsPage({ data, setData, log, goBack }) {
@@ -1200,43 +1241,74 @@ function ModelsPage({ data, setData, log, goBack }) {
   const add = () => { if (!name.trim()) return; const nd = { ...data }; nd.models.push({ id: uid(), name: name.trim() }); log(nd, `Model+: ${name.trim()}`); setData(nd); sv(nd); setName(""); setShowAdd(false); };
   const del = m => { if (!confirm(`Obriši?`)) return; const nd = { ...data, models: data.models.filter(x => x.id !== m.id) }; log(nd, `Model-: ${m.name}`); setData(nd); sv(nd); };
   const save = () => { if (!editName.trim()) return; const nd = { ...data }; const i = nd.models.findIndex(m => m.id === editId); nd.models[i] = { ...nd.models[i], name: editName.trim() }; log(nd, `Model: ${editName.trim()}`); setData(nd); sv(nd); setEditId(null); };
-  return <div style={{ padding: "14px 14px 20px" }}><button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Nazad</button><button onClick={() => { setName(""); setShowAdd(true); }} style={{ ...S.btn, width: "100%", marginBottom: 14, padding: "12px" }}><Ic d={I.plus} size={16} color="#000" /> Dodaj</button>{data.models.map(m => <div key={m.id} style={S.card}>{editId === m.id ? <div style={{ display: "flex", gap: 8 }}><input style={{ ...S.inp, flex: 1 }} value={editName} onChange={e => setEditName(e.target.value)} autoFocus onKeyDown={e => e.key === "Enter" && save()} /><button onClick={save} style={{ ...S.btnS, background: C.successBg, color: C.success, border: "none", padding: "8px" }}><Ic d={I.check} size={14} color={C.success} /></button></div> : <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><span style={{ fontWeight: 700 }}>👟 {m.name}</span><div style={{ display: "flex", gap: 5 }}><button onClick={() => { setEditId(m.id); setEditName(m.name); }} style={{ ...S.btnS, padding: 5, background: C.s2, border: `1px solid ${C.border}` }}><Ic d={I.edit} size={14} /></button><button onClick={() => del(m)} style={{ ...S.btnS, padding: 5, background: C.dangerBg, border: "none" }}><Ic d={I.trash} size={14} color={C.danger} /></button></div></div>}</div>)}{showAdd && <Modal title="👟 Dodaj model" onClose={() => setShowAdd(false)}><Fl label="Naziv *"><input style={S.inp} value={name} onChange={e => setName(e.target.value)} placeholder="Nike Air Max 90" autoFocus onKeyDown={e => e.key === "Enter" && add()} /></Fl><button onClick={add} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 15 }}>Dodaj</button></Modal>}</div>;
+  return <div style={{ padding: "14px 14px 20px" }}><button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 15 }}>← Nazad</button><button onClick={() => { setName(""); setShowAdd(true); }} style={{ ...S.btn, width: "100%", marginBottom: 14, padding: "12px" }}><Ic d={I.plus} size={16} color="#000" /> Dodaj</button>{data.models.map(m => <div key={m.id} style={S.card}>{editId === m.id ? <div style={{ display: "flex", gap: 8 }}><input style={{ ...S.inp, flex: 1 }} value={editName} onChange={e => setEditName(e.target.value)} autoFocus onKeyDown={e => e.key === "Enter" && save()} /><button onClick={save} style={{ ...S.btnS, background: C.successBg, color: C.success, border: "none", padding: "8px" }}><Ic d={I.check} size={14} color={C.success} /></button></div> : <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><span style={{ fontWeight: 700 }}>👟 {m.name}</span><div style={{ display: "flex", gap: 5 }}><button onClick={() => { setEditId(m.id); setEditName(m.name); }} style={{ ...S.btnS, padding: 5, background: C.s2, border: `1px solid ${C.border}` }}><Ic d={I.edit} size={14} /></button><button onClick={() => del(m)} style={{ ...S.btnS, padding: 5, background: C.dangerBg, border: "none" }}><Ic d={I.trash} size={14} color={C.danger} /></button></div></div>}</div>)}{showAdd && <Modal title="👟 Dodaj model" onClose={() => setShowAdd(false)}><Fl label="Naziv *"><input style={S.inp} value={name} onChange={e => setName(e.target.value)} placeholder="Nike Air Max 90" autoFocus onKeyDown={e => e.key === "Enter" && add()} /></Fl><button onClick={add} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 17 }}>Dodaj</button></Modal>}</div>;
 }
 
 function HistoryPage({ data, goBack }) {
   const [selDate, setSelDate] = useState(tdy()); const [search, setSearch] = useState(""); const [pg, setPg] = useState(0);
+  const [userFilter, setUserFilter] = useState("all");
   const fourM = new Date(); fourM.setMonth(fourM.getMonth() - 4);
   const valid = data.history.filter(h => new Date(h.date) >= fourM);
   const dayLogs = valid.filter(h => dk(h.date) === selDate);
-  const filtered = dayLogs.filter(h => !search || h.action?.toLowerCase().includes(search.toLowerCase()));
+  const filtered = dayLogs.filter(h =>
+    (!search || h.action?.toLowerCase().includes(search.toLowerCase())) &&
+    (userFilter === "all" || h.user === userFilter)
+  );
   const paged = filtered.slice(pg * PER_PAGE, (pg + 1) * PER_PAGE);
   const daysSet = useMemo(() => { const s = new Set(); valid.forEach(h => s.add(dk(h.date))); return s; }, [valid]);
   const [calM, setCalM] = useState(() => { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth() }; });
   const calDays = useMemo(() => { const f = new Date(calM.y, calM.m, 1); const last = new Date(calM.y, calM.m + 1, 0).getDate(); const dow = f.getDay() || 7; const d = []; for (let i = 1; i < dow; i++) d.push(null); for (let i = 1; i <= last; i++) d.push(i); return d; }, [calM]);
   const mn = ["Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Avg", "Sep", "Okt", "Nov", "Dec"];
+
+  // Lista svih korisnika iz istorije za filter
+  const allUsers = useMemo(() => {
+    const s = new Set(["Peconi", "Filip", "Mirela"]);
+    data.history.forEach(h => { if (h.user) s.add(h.user); });
+    return Array.from(s);
+  }, [data.history]);
+
   return (
     <div style={{ padding: "14px 14px 20px" }}>
-      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Nazad</button>
+      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 15 }}>← Nazad</button>
       <div style={{ ...S.card, padding: 14, marginBottom: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <button onClick={() => setCalM(c => { const d = new Date(c.y, c.m - 1); return { y: d.getFullYear(), m: d.getMonth() }; })} style={{ ...S.btnS, padding: "4px 10px", background: C.s2, border: `1px solid ${C.border}` }}>‹</button>
-          <div style={{ fontWeight: 700, fontSize: 15 }}>{mn[calM.m]} {calM.y}</div>
+          <div style={{ fontWeight: 700, fontSize: 17 }}>{mn[calM.m]} {calM.y}</div>
           <button onClick={() => setCalM(c => { const d = new Date(c.y, c.m + 1); return { y: d.getFullYear(), m: d.getMonth() }; })} style={{ ...S.btnS, padding: "4px 10px", background: C.s2, border: `1px solid ${C.border}` }}>›</button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 2, textAlign: "center" }}>
-          {["P", "U", "S", "Č", "P", "S", "N"].map((d, i) => <div key={i} style={{ fontSize: 10, color: C.dim, fontWeight: 700, padding: 4 }}>{d}</div>)}
+          {["P", "U", "S", "Č", "P", "S", "N"].map((d, i) => <div key={i} style={{ fontSize: 12, color: C.dim, fontWeight: 700, padding: 4 }}>{d}</div>)}
           {calDays.map((d, i) => {
             if (!d) return <div key={i} />;
             const dks = `${calM.y}-${String(calM.m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
             const has = daysSet.has(dks); const sel = dks === selDate; const td2 = dks === tdy();
-            return <button key={i} onClick={() => { setSelDate(dks); setPg(0); }} style={{ padding: 6, fontSize: 13, fontWeight: sel ? 800 : has ? 600 : 400, background: sel ? C.accent : "transparent", color: sel ? "#000" : has ? C.accent : td2 ? C.text : C.dim, borderRadius: 8, border: td2 && !sel ? `1px solid ${C.accent}44` : "none", cursor: "pointer", fontFamily: F, position: "relative" }}>{d}{has && !sel && <div style={{ position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)", width: 4, height: 4, borderRadius: "50%", background: C.accent }} />}</button>;
+            return <button key={i} onClick={() => { setSelDate(dks); setPg(0); }} style={{ padding: 6, fontSize: 15, fontWeight: sel ? 800 : has ? 600 : 400, background: sel ? C.accent : "transparent", color: sel ? "#000" : has ? C.accent : td2 ? C.text : C.dim, borderRadius: 8, border: td2 && !sel ? `1px solid ${C.accent}44` : "none", cursor: "pointer", fontFamily: F, position: "relative" }}>{d}{has && !sel && <div style={{ position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)", width: 4, height: 4, borderRadius: "50%", background: C.accent }} />}</button>;
           })}
         </div>
       </div>
-      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>📋 {fd(selDate + "T00:00:00")} — {dayLogs.length} zapisa</div>
-      <div style={{ position: "relative", marginBottom: 12 }}><input style={{ ...S.inp, paddingLeft: 36, fontSize: 13 }} value={search} onChange={e => { setSearch(e.target.value); setPg(0); }} placeholder="Pretraži..." /><div style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)" }}><Ic d={I.search} size={16} color={C.dim} /></div></div>
+      <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>📋 {fd(selDate + "T00:00:00")} — {dayLogs.length} zapisa</div>
+
+      {/* User filter buttons */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
+        <button onClick={() => { setUserFilter("all"); setPg(0); }} style={{
+          flex: "1 1 auto", padding: "8px 12px", fontSize: 14, fontWeight: 700,
+          borderRadius: 8, border: `1px solid ${userFilter === "all" ? C.accent : C.border}`,
+          background: userFilter === "all" ? C.accentBg : C.s2,
+          color: userFilter === "all" ? C.accent : C.text, cursor: "pointer", fontFamily: F,
+        }}>👥 Svi</button>
+        {allUsers.map(u => (
+          <button key={u} onClick={() => { setUserFilter(u); setPg(0); }} style={{
+            flex: "1 1 auto", padding: "8px 12px", fontSize: 14, fontWeight: 700,
+            borderRadius: 8, border: `1px solid ${userFilter === u ? C.accent : C.border}`,
+            background: userFilter === u ? C.accentBg : C.s2,
+            color: userFilter === u ? C.accent : C.text, cursor: "pointer", fontFamily: F,
+          }}>{u}</button>
+        ))}
+      </div>
+
+      <div style={{ position: "relative", marginBottom: 12 }}><input style={{ ...S.inp, paddingLeft: 36, fontSize: 15 }} value={search} onChange={e => { setSearch(e.target.value); setPg(0); }} placeholder="Pretraži..." /><div style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)" }}><Ic d={I.search} size={16} color={C.dim} /></div></div>
       {paged.length === 0 && <div style={{ textAlign: "center", padding: 30, color: C.dim }}>Nema zapisa</div>}
-      {paged.map((h, i) => <div key={h.id || i} style={{ padding: "10px 0", borderBottom: `1px solid ${C.border}` }}><div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{h.action}</div><div style={{ fontSize: 11, color: C.dim }}>{h.user} • {fdt(h.date)}</div></div>)}
+      {paged.map((h, i) => <div key={h.id || i} style={{ padding: "10px 0", borderBottom: `1px solid ${C.border}` }}><div style={{ fontSize: 15, fontWeight: 600, marginBottom: 2 }}>{h.action}</div><div style={{ fontSize: 13, color: C.dim }}>{h.user} • {fdt(h.date)}</div></div>)}
       <Pager page={pg} total={filtered.length} setPage={setPg} />
     </div>
   );
@@ -1252,11 +1324,47 @@ function ProfitPage({ data, setData, log, goBack }) {
   const delA = a => { if (!confirm(`Obriši zapis reklame od ${fm(a.amount)} (${fd(a.date + "T00:00:00")})?`)) return; const nd = { ...data, adSpend: data.adSpend.filter(x => x.id !== a.id) }; log(nd, `Obrisana reklama: ${fd(a.date + "T00:00:00")}, ${fm(a.amount)}`); setData(nd); sv(nd); };
 
   const getCost = ms => { let t = 0; for (const c of data.costs) { if (ms?.toLowerCase().includes(c.model.toLowerCase())) t += c.price; } return t; };
+
+  // Helper: dobij "YYYY-MM" iz datuma
+  const monthKey = (dateStr) => (dateStr || "").slice(0, 7);
+  const MONTHS_SR = ["Januar", "Februar", "Mart", "April", "Maj", "Jun", "Jul", "Avgust", "Septembar", "Oktobar", "Novembar", "Decembar"];
+  const formatMonth = (mk) => {
+    if (!mk) return "";
+    const [y, m] = mk.split("-");
+    return `${MONTHS_SR[parseInt(m) - 1]} ${y}`;
+  };
+  const thisMonth = new Date().toISOString().slice(0, 7);
+
+  // Lista svih meseci koji imaju podatke (porudžbine ili reklame)
+  const availableMonths = useMemo(() => {
+    const set = new Set();
+    (data.orders || []).forEach(o => { if (o.dateCreated) set.add(monthKey(dk(o.dateCreated))); });
+    (data.adSpend || []).forEach(a => { if (a.date) set.add(monthKey(a.date)); });
+    set.add(thisMonth); // uvek dodaj tekući mesec
+    return Array.from(set).sort().reverse(); // najnoviji prvo
+  }, [data.orders, data.adSpend]);
+
+  const [selectedMonth, setSelectedMonth] = useState(thisMonth);
+
   const daily = useMemo(() => {
-    const d = {}; data.orders.forEach(o => { if (o.status === "odbijeno") return; const k = dk(o.dateCreated); if (!d[k]) d[k] = { rev: 0, cost: 0, ads: 0, n: 0 }; d[k].rev += o.codAmount || 0; d[k].cost += getCost(o.model); d[k].n++; });
-    data.adSpend.forEach(a => { const k = a.date; if (!d[k]) d[k] = { rev: 0, cost: 0, ads: 0, n: 0 }; d[k].ads += a.amount || 0; });
+    const d = {};
+    data.orders.forEach(o => {
+      if (o.status === "odbijeno") return;
+      const k = dk(o.dateCreated);
+      if (monthKey(k) !== selectedMonth) return; // filter po mesecu
+      if (!d[k]) d[k] = { rev: 0, cost: 0, ads: 0, n: 0 };
+      d[k].rev += o.codAmount || 0;
+      d[k].cost += getCost(o.model);
+      d[k].n++;
+    });
+    data.adSpend.forEach(a => {
+      if (monthKey(a.date) !== selectedMonth) return;
+      const k = a.date;
+      if (!d[k]) d[k] = { rev: 0, cost: 0, ads: 0, n: 0 };
+      d[k].ads += a.amount || 0;
+    });
     return Object.entries(d).sort((a, b) => b[0].localeCompare(a[0])).map(([date, v]) => ({ date, ...v, profit: v.rev - v.cost - v.ads }));
-  }, [data.orders, data.adSpend, data.costs]);
+  }, [data.orders, data.adSpend, data.costs, selectedMonth]);
   const totP = daily.reduce((s, d) => s + d.profit, 0);
   const totR = daily.reduce((s, d) => s + d.rev, 0);
   const totC = daily.reduce((s, d) => s + d.cost, 0);
@@ -1264,40 +1372,49 @@ function ProfitPage({ data, setData, log, goBack }) {
   const [pg, setPg] = useState(0);
   const pagedD = daily.slice(pg * PER_PAGE, (pg + 1) * PER_PAGE);
 
-  if (tab === "costs") return <div style={{ padding: "14px 14px 20px" }}><button onClick={() => setTab("main")} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Profit</button><button onClick={() => setShowCost(true)} style={{ ...S.btn, width: "100%", marginBottom: 14, padding: "12px" }}><Ic d={I.plus} size={16} color="#000" /> Dodaj cenu</button>{data.costs.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}>💰 Nema zapisa</div>}{data.costs.map(c => <div key={c.id} style={{ ...S.card, display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><div style={{ fontWeight: 700 }}>{c.model}</div><div style={{ fontSize: 13, color: C.accent, fontFamily: FM, fontWeight: 700 }}>{fm(c.price)}</div></div><button onClick={() => delC(c)} style={{ ...S.btnD, padding: "5px 7px" }}><Ic d={I.trash} size={14} color={C.danger} /></button></div>)}{showCost && <Modal title="Nabavna cena" onClose={() => setShowCost(false)}><Fl label="Model"><select style={S.sel} value={cm} onChange={e => setCm(e.target.value)}><option value="">—</option>{data.models.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}</select></Fl><Fl label="Cena (RSD) *"><input style={S.inp} type="number" value={cp} onChange={e => setCp(e.target.value)} placeholder="1500" /></Fl><button onClick={addC} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 15 }}>Sačuvaj</button></Modal>}</div>;
+  if (tab === "costs") return <div style={{ padding: "14px 14px 20px" }}><button onClick={() => setTab("main")} style={{ ...S.btn2, marginBottom: 14, fontSize: 15 }}>← Profit</button><button onClick={() => setShowCost(true)} style={{ ...S.btn, width: "100%", marginBottom: 14, padding: "12px" }}><Ic d={I.plus} size={16} color="#000" /> Dodaj cenu</button>{data.costs.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}>💰 Nema zapisa</div>}{data.costs.map(c => <div key={c.id} style={{ ...S.card, display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><div style={{ fontWeight: 700 }}>{c.model}</div><div style={{ fontSize: 15, color: C.accent, fontFamily: FM, fontWeight: 700 }}>{fm(c.price)}</div></div><button onClick={() => delC(c)} style={{ ...S.btnD, padding: "5px 7px" }}><Ic d={I.trash} size={14} color={C.danger} /></button></div>)}{showCost && <Modal title="Nabavna cena" onClose={() => setShowCost(false)}><Fl label="Model"><select style={S.sel} value={cm} onChange={e => setCm(e.target.value)}><option value="">—</option>{data.models.map(m => <option key={m.id} value={m.name}>{m.name}</option>)}</select></Fl><Fl label="Cena (RSD) *"><input style={S.inp} type="number" value={cp} onChange={e => setCp(e.target.value)} placeholder="1500" /></Fl><button onClick={addC} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 17 }}>Sačuvaj</button></Modal>}</div>;
 
   if (tab === "ads") {
     const adsSorted = [...(data.adSpend || [])].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
     return <div style={{ padding: "14px 14px 20px" }}>
-      <button onClick={() => setTab("main")} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Profit</button>
+      <button onClick={() => setTab("main")} style={{ ...S.btn2, marginBottom: 14, fontSize: 15 }}>← Profit</button>
       <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid #fb923c33`, background: "rgba(251,146,60,0.08)", padding: 14 }}>
         <div style={S.stL}>Ukupno reklame</div>
-        <div style={{ ...S.stV, fontSize: 24, color: "#fb923c" }}>{fm(adsSorted.reduce((s, a) => s + (a.amount || 0), 0))}</div>
-        <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{adsSorted.length} zapisa</div>
+        <div style={{ ...S.stV, fontSize: 26, color: "#fb923c" }}>{fm(adsSorted.reduce((s, a) => s + (a.amount || 0), 0))}</div>
+        <div style={{ fontSize: 13, color: C.dim, marginTop: 2 }}>{adsSorted.length} zapisa</div>
       </div>
       <button onClick={() => setShowAd(true)} style={{ ...S.btn, width: "100%", marginBottom: 14, padding: "12px" }}><Ic d={I.plus} size={16} color="#000" /> Dodaj reklamu</button>
       {adsSorted.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}>📢 Nema zapisa reklama</div>}
       {adsSorted.map(a => <div key={a.id} style={{ ...S.card, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontWeight: 700 }}>{fd(a.date + "T00:00:00")}</div>
-          <div style={{ fontSize: 14, color: "#fb923c", fontFamily: FM, fontWeight: 700, marginTop: 2 }}>{fm(a.amount)}</div>
+          <div style={{ fontSize: 16, color: "#fb923c", fontFamily: FM, fontWeight: 700, marginTop: 2 }}>{fm(a.amount)}</div>
         </div>
         <button onClick={() => delA(a)} style={{ ...S.btnD, padding: "7px 10px" }}><Ic d={I.trash} size={14} color={C.danger} /></button>
       </div>)}
-      {showAd && <Modal title="📢 Nova reklama" onClose={() => setShowAd(false)}><Fl label="Datum"><input style={S.inp} type="date" value={ad} onChange={e => setAd(e.target.value)} /></Fl><Fl label="Iznos *"><input style={S.inp} type="number" value={aa} onChange={e => setAa(e.target.value)} placeholder="5000" /></Fl><button onClick={addA} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 15 }}>Sačuvaj</button></Modal>}
+      {showAd && <Modal title="📢 Nova reklama" onClose={() => setShowAd(false)}><Fl label="Datum"><input style={S.inp} type="date" value={ad} onChange={e => setAd(e.target.value)} /></Fl><Fl label="Iznos *"><input style={S.inp} type="number" value={aa} onChange={e => setAa(e.target.value)} placeholder="5000" /></Fl><button onClick={addA} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 17 }}>Sačuvaj</button></Modal>}
     </div>;
   }
 
   return (
     <div style={{ padding: "14px 14px 20px" }}>
-      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Nazad</button>
-      <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid ${totP > 0 ? C.success + "33" : C.danger + "33"}`, background: totP > 0 ? C.successBg : C.dangerBg, padding: 16 }}><div style={S.stL}>Ukupan profit</div><div style={{ ...S.stV, fontSize: 28, color: totP > 0 ? C.success : C.danger }}>{fm(totP)}</div></div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}><div style={S.stat}><div style={S.stL}>Otkup</div><div style={{ ...S.stV, fontSize: 14, color: C.info }}>{fm(totR)}</div></div><div style={S.stat}><div style={S.stL}>Nabavka</div><div style={{ ...S.stV, fontSize: 14, color: C.danger }}>{fm(totC)}</div></div><div style={S.stat}><div style={S.stL}>Reklame</div><div style={{ ...S.stV, fontSize: 14, color: "#fb923c" }}>{fm(totA)}</div></div></div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}><button onClick={() => setTab("costs")} style={{ ...S.btn2, flex: 1, fontSize: 13 }}>💰 Nabavne cene</button><button onClick={() => setTab("ads")} style={{ ...S.btn2, flex: 1, fontSize: 13, color: "#fb923c", borderColor: "#fb923c44" }}>📢 Reklame</button></div>
-      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}>📊 Dnevni pregled</div>
-      {pagedD.map(d => <div key={d.date} style={S.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}><div style={{ fontWeight: 700, fontSize: 14 }}>{fd(d.date + "T00:00:00")}</div><div style={{ fontWeight: 800, fontFamily: FM, fontSize: 15, color: d.profit > 0 ? C.success : C.danger }}>{fm(d.profit)}</div></div><div style={{ display: "flex", gap: 12, fontSize: 12, color: C.dim, flexWrap: "wrap" }}><span>Otkup: {fm(d.rev)}</span><span>Nabavka: {fm(d.cost)}</span>{d.ads > 0 && <span>Reklame: {fm(d.ads)}</span>}<span>{d.n} nar.</span></div></div>)}
+      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 15 }}>← Nazad</button>
+
+      {/* Month selector */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 14, alignItems: "center" }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: C.dim }}>📅 Mesec:</div>
+        <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} style={{ ...S.sel, flex: 1, fontSize: 16, fontWeight: 700, padding: "10px 12px" }}>
+          {availableMonths.map(mk => <option key={mk} value={mk}>{formatMonth(mk)}{mk === thisMonth ? " (trenutni)" : ""}</option>)}
+        </select>
+      </div>
+
+      <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid ${totP > 0 ? C.success + "33" : C.danger + "33"}`, background: totP > 0 ? C.successBg : C.dangerBg, padding: 16 }}><div style={S.stL}>Profit za {formatMonth(selectedMonth)}</div><div style={{ ...S.stV, fontSize: 30, color: totP > 0 ? C.success : C.danger }}>{fm(totP)}</div></div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}><div style={S.stat}><div style={S.stL}>Otkup</div><div style={{ ...S.stV, fontSize: 16, color: C.info }}>{fm(totR)}</div></div><div style={S.stat}><div style={S.stL}>Nabavka</div><div style={{ ...S.stV, fontSize: 16, color: C.danger }}>{fm(totC)}</div></div><div style={S.stat}><div style={S.stL}>Reklame</div><div style={{ ...S.stV, fontSize: 16, color: "#fb923c" }}>{fm(totA)}</div></div></div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}><button onClick={() => setTab("costs")} style={{ ...S.btn2, flex: 1, fontSize: 15 }}>💰 Nabavne cene</button><button onClick={() => setTab("ads")} style={{ ...S.btn2, flex: 1, fontSize: 15, color: "#fb923c", borderColor: "#fb923c44" }}>📢 Reklame</button></div>
+      <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>📊 Dnevni pregled</div>
+      {pagedD.map(d => <div key={d.date} style={S.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}><div style={{ fontWeight: 700, fontSize: 16 }}>{fd(d.date + "T00:00:00")}</div><div style={{ fontWeight: 800, fontFamily: FM, fontSize: 17, color: d.profit > 0 ? C.success : C.danger }}>{fm(d.profit)}</div></div><div style={{ display: "flex", gap: 12, fontSize: 14, color: C.dim, flexWrap: "wrap" }}><span>Otkup: {fm(d.rev)}</span><span>Nabavka: {fm(d.cost)}</span>{d.ads > 0 && <span>Reklame: {fm(d.ads)}</span>}<span>{d.n} nar.</span></div></div>)}
       <Pager page={pg} total={daily.length} setPage={setPg} />
-      {showAd && <Modal title="📢 Reklame" onClose={() => setShowAd(false)}><Fl label="Datum"><input style={S.inp} type="date" value={ad} onChange={e => setAd(e.target.value)} /></Fl><Fl label="Iznos *"><input style={S.inp} type="number" value={aa} onChange={e => setAa(e.target.value)} placeholder="5000" /></Fl><button onClick={addA} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 15 }}>Sačuvaj</button></Modal>}
+      {showAd && <Modal title="📢 Reklame" onClose={() => setShowAd(false)}><Fl label="Datum"><input style={S.inp} type="date" value={ad} onChange={e => setAd(e.target.value)} /></Fl><Fl label="Iznos *"><input style={S.inp} type="number" value={aa} onChange={e => setAa(e.target.value)} placeholder="5000" /></Fl><button onClick={addA} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 17 }}>Sačuvaj</button></Modal>}
     </div>
   );
 }
@@ -1318,15 +1435,15 @@ function ExportPage({ data, goBack }) {
 
   return (
     <div style={{ padding: "14px 14px 20px" }}>
-      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Nazad</button>
-      <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid ${C.border}`, padding: 14 }}><div style={S.stL}>Kontakti za Viber</div><div style={{ ...S.stV, fontSize: 26, color: C.accent }}>{contacts.length}</div></div>
+      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 15 }}>← Nazad</button>
+      <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid ${C.border}`, padding: 14 }}><div style={S.stL}>Kontakti za Viber</div><div style={{ ...S.stV, fontSize: 28, color: C.accent }}>{contacts.length}</div></div>
       <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-        <button onClick={() => doCopy("phones")} style={{ ...S.btn, flex: 1, padding: "10px", fontSize: 13 }}>📋 Samo brojevi</button>
-        <button onClick={() => doCopy("both")} style={{ ...S.btn2, flex: 1, padding: "10px", fontSize: 13 }}>📋 Brojevi + Imena</button>
+        <button onClick={() => doCopy("phones")} style={{ ...S.btn, flex: 1, padding: "10px", fontSize: 15 }}>📋 Samo brojevi</button>
+        <button onClick={() => doCopy("both")} style={{ ...S.btn2, flex: 1, padding: "10px", fontSize: 15 }}>📋 Brojevi + Imena</button>
       </div>
-      {copied && <div style={{ background: C.successBg, color: C.success, padding: "10px 14px", borderRadius: 10, marginBottom: 12, fontSize: 13, textAlign: "center", fontWeight: 700 }}>{copied}</div>}
-      <div style={{ fontSize: 12, color: C.dim, marginBottom: 10 }}>Format: +381XXXXXXXXX</div>
-      {paged.map((c, i) => <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: `1px solid ${C.border}`, fontSize: 13 }}><span>{c.name}</span><span style={{ fontFamily: FM, color: C.accent, fontSize: 12 }}>{c.phone}</span></div>)}
+      {copied && <div style={{ background: C.successBg, color: C.success, padding: "10px 14px", borderRadius: 10, marginBottom: 12, fontSize: 15, textAlign: "center", fontWeight: 700 }}>{copied}</div>}
+      <div style={{ fontSize: 14, color: C.dim, marginBottom: 10 }}>Format: +381XXXXXXXXX</div>
+      {paged.map((c, i) => <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: `1px solid ${C.border}`, fontSize: 15 }}><span>{c.name}</span><span style={{ fontFamily: FM, color: C.accent, fontSize: 14 }}>{c.phone}</span></div>)}
       <Pager page={pg} total={contacts.length} setPage={p => setPg(p)} />
     </div>
   );
@@ -1371,17 +1488,35 @@ function EditOrderModal({ order, data, setData, log, onClose }) {
     <Fl label="PX broj"><input style={S.inp} value={form.pxBroj} onChange={e => setForm({ ...form, pxBroj: e.target.value })} /></Fl>
     {form.models.map((m, idx) => (
       <div key={idx} style={{ background: idx > 0 ? C.s2 : "transparent", borderRadius: 10, padding: idx > 0 ? 12 : 0, marginBottom: 10, border: idx > 0 ? `1px solid ${C.border}` : "none" }}>
-        {idx > 0 && <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 12, fontWeight: 700, color: C.accent }}>Patika #{idx + 1}</span><button onClick={() => rmSlot(idx)} style={{ ...S.btnS, background: C.dangerBg, color: C.danger, border: "none", padding: "3px 8px", fontSize: 11 }}>✕</button></div>}
+        {idx > 0 && <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}><span style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>Patika #{idx + 1}</span><button onClick={() => rmSlot(idx)} style={{ ...S.btnS, background: C.dangerBg, color: C.danger, border: "none", padding: "3px 8px", fontSize: 13 }}>✕</button></div>}
         <Fl label={idx === 0 ? "Model patika" : "Model"}>
           <select style={S.sel} value={m.model} onChange={e => upM(idx, "model", e.target.value)}><option value="">— Izaberi —</option>{data.models.map(md => <option key={md.id} value={md.name}>{md.name}</option>)}<option value="__custom">✏️ Ručno</option></select>
         </Fl>
         {m.model === "__custom" && <Fl label="Naziv"><input style={S.inp} value={m.custom} onChange={e => upM(idx, "custom", e.target.value)} /></Fl>}
-        <Fl label="Broj patika"><input style={S.inp} value={m.size} onChange={e => upM(idx, "size", e.target.value)} /></Fl>
+        <Fl label="Broj patika">
+          <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }}>
+            {["40", "41", "42", "43", "44", "45"].map(sz => (
+              <button key={sz} onClick={() => upM(idx, "size", sz)} style={{
+                flex: "1 1 calc(16.66% - 5px)",
+                padding: "11px 0",
+                fontSize: 17,
+                fontWeight: 800,
+                borderRadius: 10,
+                border: m.size === sz ? `2px solid ${C.accent}` : `1px solid ${C.border}`,
+                background: m.size === sz ? C.accentBg : C.s2,
+                color: m.size === sz ? C.accent : C.text,
+                cursor: "pointer",
+                fontFamily: F,
+              }}>{sz}</button>
+            ))}
+          </div>
+          <input style={S.inp} value={m.size} onChange={e => upM(idx, "size", e.target.value)} placeholder="Ručno ukucaj broj..." />
+        </Fl>
       </div>
     ))}
-    <button onClick={addSlot} style={{ ...S.btn2, width: "100%", marginBottom: 12, fontSize: 13, color: C.accent, borderColor: C.accent + "44" }}>➕ Dodaj još pari patika</button>
+    <button onClick={addSlot} style={{ ...S.btn2, width: "100%", marginBottom: 12, fontSize: 15, color: C.accent, borderColor: C.accent + "44" }}>➕ Dodaj još pari patika</button>
     <Fl label="Napomena"><input style={S.inp} value={form.note} onChange={e => setForm({ ...form, note: e.target.value })} /></Fl>
-    <button onClick={save} style={{ ...S.btn, width: "100%", marginTop: 4, padding: "13px", fontSize: 15 }}>💾 Sačuvaj izmene</button>
+    <button onClick={save} style={{ ...S.btn, width: "100%", marginTop: 4, padding: "13px", fontSize: 17 }}>💾 Sačuvaj izmene</button>
   </Modal>;
 }
 
@@ -1426,35 +1561,35 @@ function UrgentnoPage({ data, setData, user, log, goBack }) {
 
   return (
     <div style={{ padding: "14px 14px 20px" }}>
-      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 13 }}>← Nazad</button>
+      <button onClick={goBack} style={{ ...S.btn2, marginBottom: 14, fontSize: 15 }}>← Nazad</button>
 
       {/* Notif permission bar */}
       {notifSupported() && notifPerm !== "granted" && (
         <div style={{ ...S.card, background: notifPerm === "denied" ? C.dangerBg : C.infoBg, borderColor: notifPerm === "denied" ? C.danger + "44" : C.info + "44", padding: 14 }}>
           {notifPerm === "denied" ? (
             <>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.danger, marginBottom: 6 }}>🔕 Notifikacije blokirane</div>
-              <div style={{ fontSize: 12, color: C.dim, lineHeight: 1.5 }}>Notifikacije su blokirane u browseru. Da ih uključiš: klikni katanac/info ikonu levo od adrese sajta → Notifications → Allow.</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: C.danger, marginBottom: 6 }}>🔕 Notifikacije blokirane</div>
+              <div style={{ fontSize: 14, color: C.dim, lineHeight: 1.5 }}>Notifikacije su blokirane u browseru. Da ih uključiš: klikni katanac/info ikonu levo od adrese sajta → Notifications → Allow.</div>
             </>
           ) : (
             <>
-              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>🔔 Uključi notifikacije</div>
-              <div style={{ fontSize: 12, color: C.dim, marginBottom: 10, lineHeight: 1.5 }}>Dobijaj obaveštenje čim se neka porudžbina ne isporuči u roku od 3 dana.</div>
-              <button onClick={enableNotif} style={{ ...S.btn, padding: "9px 16px", fontSize: 13, width: "100%" }}>🔔 Uključi notifikacije</button>
+              <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>🔔 Uključi notifikacije</div>
+              <div style={{ fontSize: 14, color: C.dim, marginBottom: 10, lineHeight: 1.5 }}>Dobijaj obaveštenje čim se neka porudžbina ne isporuči u roku od 3 dana.</div>
+              <button onClick={enableNotif} style={{ ...S.btn, padding: "9px 16px", fontSize: 15, width: "100%" }}>🔔 Uključi notifikacije</button>
             </>
           )}
         </div>
       )}
       {notifSupported() && notifPerm === "granted" && (
-        <div style={{ fontSize: 11, color: C.success, textAlign: "center", marginBottom: 10 }}>🔔 Notifikacije su aktivne</div>
+        <div style={{ fontSize: 13, color: C.success, textAlign: "center", marginBottom: 10 }}>🔔 Notifikacije su aktivne</div>
       )}
 
       <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, border: `1px solid ${C.danger}33`, background: C.dangerBg, borderRadius: 14, padding: 14 }}>
         <div style={{ ...S.stL, color: C.danger }}>⚠️ URGENTNO — više od 3 dana bez isporuke</div>
-        <div style={{ ...S.stV, fontSize: 28, color: C.danger }}>{urgent.length}</div>
+        <div style={{ ...S.stV, fontSize: 30, color: C.danger }}>{urgent.length}</div>
       </div>
 
-      {urgent.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}><div style={{ fontSize: 32, marginBottom: 6 }}>✅</div>Nema urgentnih porudžbina</div>}
+      {urgent.length === 0 && <div style={{ textAlign: "center", padding: 40, color: C.dim }}><div style={{ fontSize: 34, marginBottom: 6 }}>✅</div>Nema urgentnih porudžbina</div>}
 
       {urgent.map(o => {
         const st = getDispSt(o);
@@ -1464,31 +1599,31 @@ function UrgentnoPage({ data, setData, user, log, goBack }) {
           <div key={o.id} style={{ ...S.card, cursor: "pointer", borderColor: wasCalled ? C.success + "55" : C.danger + "55", background: wasCalled ? C.s1 : "rgba(239,68,68,0.05)" }} onClick={() => setExpanded(exp ? null : o.id)}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: 18 }}>{o.name}</div>
-                <div style={{ fontSize: 15, color: C.dim, marginTop: 2 }}>{o.model || "—"}</div>
+                <div style={{ fontWeight: 700, fontSize: 20 }}>{o.name}</div>
+                <div style={{ fontSize: 17, color: C.dim, marginTop: 2 }}>{o.model || "—"}</div>
               </div>
               <span style={S.badge(C.danger, C.dangerBg)}>⏰ {o.daysAgo} dana</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: wasCalled ? 6 : 0 }}>
-              <div style={{ fontSize: 12, color: C.dim }}>{o.assignedTo} • PX: <span style={{ color: C.accent }}>{o.pxBroj}</span></div>
+              <div style={{ fontSize: 14, color: C.dim }}>{o.assignedTo} • PX: <span style={{ color: C.accent }}>{o.pxBroj}</span></div>
               <span style={S.badge(st.color, st.bg)}>{st.icon} {st.label}</span>
             </div>
-            {wasCalled && <div style={{ fontSize: 11, color: C.success, fontWeight: 600, marginTop: 4 }}>✅ Pozvan ({fdt(o.calledAt)} — {o.calledBy})</div>}
+            {wasCalled && <div style={{ fontSize: 13, color: C.success, fontWeight: 600, marginTop: 4 }}>✅ Pozvan ({fdt(o.calledAt)} — {o.calledBy})</div>}
 
             {exp && (
               <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}` }} onClick={e => e.stopPropagation()}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12, marginBottom: 12 }}>
-                  <div style={{ fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Telefon:</span> <a href={`tel:${fmtPhoneForTel(o.phone)}`} style={{ color: C.accent, fontWeight: 700, textDecoration: "none" }}>{o.phone || "—"}</a></div>
-                  <div style={{ fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Mesto:</span> <span style={{ fontWeight: 600 }}>{o.city || "—"}</span></div>
-                  <div style={{ gridColumn: "1/-1", fontSize: 15 }}><span style={{ color: C.dim, fontSize: 12 }}>Adresa:</span> <span style={{ fontWeight: 600 }}>{o.address || "—"}</span></div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 14, marginBottom: 12 }}>
+                  <div style={{ fontSize: 17 }}><span style={{ color: C.dim, fontSize: 14 }}>Telefon:</span> <a href={`tel:${fmtPhoneForTel(o.phone)}`} style={{ color: C.accent, fontWeight: 700, textDecoration: "none" }}>{o.phone || "—"}</a></div>
+                  <div style={{ fontSize: 17 }}><span style={{ color: C.dim, fontSize: 14 }}>Mesto:</span> <span style={{ fontWeight: 600 }}>{o.city || "—"}</span></div>
+                  <div style={{ gridColumn: "1/-1", fontSize: 17 }}><span style={{ color: C.dim, fontSize: 14 }}>Adresa:</span> <span style={{ fontWeight: 600 }}>{o.address || "—"}</span></div>
                   <div><span style={{ color: C.dim }}>Iznos:</span> <span style={{ color: C.accent, fontWeight: 700, fontFamily: FM }}>{fm(o.codAmount)}</span></div>
                   <div><span style={{ color: C.dim }}>PX dobijen:</span> {fd(o.datePx || o.dateCreated)}</div>
                 </div>
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {o.phone && <a href={`tel:${fmtPhoneForTel(o.phone)}`} onClick={() => markCalled(o)} style={{ ...S.btn, textDecoration: "none", flex: "1 1 calc(50% - 3px)", fontSize: 13, padding: "10px", justifyContent: "center" }}>📞 Pozovi</a>}
-                  {o.phone && <a href={`viber://chat?number=${fmtPhoneForViber(o.phone)}`} style={{ ...S.btn2, textDecoration: "none", flex: "1 1 calc(50% - 3px)", fontSize: 13, padding: "10px", justifyContent: "center", color: "#7360f2", borderColor: "#7360f244" }}>💬 Viber</a>}
-                  {o.pxBroj && <a href={trackUrl(o.pxBroj)} target="_blank" rel="noopener noreferrer" style={{ ...S.btn2, textDecoration: "none", flex: "1 1 calc(50% - 3px)", fontSize: 13, padding: "10px", justifyContent: "center", color: C.accent, borderColor: C.accent + "44" }}>📦 Prati PX</a>}
-                  <button onClick={() => markCalled(o)} style={{ ...S.btn2, flex: "1 1 calc(50% - 3px)", fontSize: 13, color: C.success, borderColor: C.success + "44", padding: "10px", justifyContent: "center" }}>✅ Pozvan</button>
+                  {o.phone && <a href={`tel:${fmtPhoneForTel(o.phone)}`} onClick={() => markCalled(o)} style={{ ...S.btn, textDecoration: "none", flex: "1 1 calc(50% - 3px)", fontSize: 15, padding: "10px", justifyContent: "center" }}>📞 Pozovi</a>}
+                  {o.phone && <a href={`viber://chat?number=${fmtPhoneForViber(o.phone)}`} style={{ ...S.btn2, textDecoration: "none", flex: "1 1 calc(50% - 3px)", fontSize: 15, padding: "10px", justifyContent: "center", color: "#7360f2", borderColor: "#7360f244" }}>💬 Viber</a>}
+                  {o.pxBroj && <a href={trackUrl(o.pxBroj)} target="_blank" rel="noopener noreferrer" style={{ ...S.btn2, textDecoration: "none", flex: "1 1 calc(50% - 3px)", fontSize: 15, padding: "10px", justifyContent: "center", color: C.accent, borderColor: C.accent + "44" }}>📦 Prati PX</a>}
+                  <button onClick={() => markCalled(o)} style={{ ...S.btn2, flex: "1 1 calc(50% - 3px)", fontSize: 15, color: C.success, borderColor: C.success + "44", padding: "10px", justifyContent: "center" }}>✅ Pozvan</button>
                 </div>
               </div>
             )}
@@ -1579,9 +1714,22 @@ export default function App() {
   // Fallback polling when Supabase not used
   useEffect(() => {
     if (!user || supabase) return;
-    const iv = setInterval(() => { loadFromDb(); }, 20000);
+    const iv = setInterval(() => { loadFromDb(); }, 5000);
     return () => clearInterval(iv);
   }, [user]);
+
+  // Brzo osvezavanje svakih 5 sekundi (u slucaju da Realtime nije dostupan ili cache problema)
+  useEffect(() => {
+    if (!user || !supabase) return;
+    const iv = setInterval(() => { loadFromDb(); }, 5000);
+    return () => clearInterval(iv);
+  }, [user]);
+
+  // Refresh na promenu tab-a
+  useEffect(() => {
+    if (!user) return;
+    loadFromDb().catch(() => {});
+  }, [page, user]);
 
   // Urgent notifications — samo za administratora
   useEffect(() => {
@@ -1639,12 +1787,12 @@ export default function App() {
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <div style={{ padding: "14px 16px", background: C.s1, borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ display: "flex", alignItems: "center", gap: isDesktop ? 20 : 8, flex: isDesktop ? 1 : "initial" }}>
-          <span style={{ fontSize: 18, fontWeight: 900, background: `linear-gradient(135deg,${C.accent},#ef4444)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>eCom</span>
-          {!isDesktop && <span style={{ fontSize: 12, color: C.dim }}>{titles[page]}</span>}
+          <span style={{ fontSize: 20, fontWeight: 900, background: `linear-gradient(135deg,${C.accent},#ef4444)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>eCom</span>
+          {!isDesktop && <span style={{ fontSize: 14, color: C.dim }}>{titles[page]}</span>}
           {isDesktop && (
             <div style={{ display: "flex", gap: 4, marginLeft: 20 }}>
               {navItems.map(n => (
-                <button key={n.id} onClick={() => setPage(n.id)} style={{ padding: "6px 12px", fontSize: 13, fontWeight: activeP === n.id ? 700 : 500, color: activeP === n.id ? C.accent : C.dim, background: activeP === n.id ? C.accentBg : "transparent", border: "none", borderRadius: 8, cursor: "pointer", fontFamily: F, display: "flex", alignItems: "center", gap: 6 }}>
+                <button key={n.id} onClick={() => setPage(n.id)} style={{ padding: "6px 12px", fontSize: 15, fontWeight: activeP === n.id ? 700 : 500, color: activeP === n.id ? C.accent : C.dim, background: activeP === n.id ? C.accentBg : "transparent", border: "none", borderRadius: 8, cursor: "pointer", fontFamily: F, display: "flex", alignItems: "center", gap: 6 }}>
                   <Ic d={n.ic} size={15} color={activeP === n.id ? C.accent : C.dim} />
                   {n.l}
                 </button>
@@ -1653,11 +1801,11 @@ export default function App() {
           )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 11, padding: "3px 9px", borderRadius: 20, background: isA ? "rgba(239,68,68,0.15)" : C.accentBg, color: isA ? "#ef4444" : C.accent, fontWeight: 700 }}>{user.username}{isA ? " ★" : ""}</span>
+          <span style={{ fontSize: 13, padding: "3px 9px", borderRadius: 20, background: isA ? "rgba(239,68,68,0.15)" : C.accentBg, color: isA ? "#ef4444" : C.accent, fontWeight: 700 }}>{user.username}{isA ? " ★" : ""}</span>
           <button onClick={() => { try { localStorage.removeItem("ecom-rem-u"); localStorage.removeItem("ecom-rem-p"); } catch {} setUser(null); setPage("orders"); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 3 }}><Ic d={I.logout} size={17} color={C.dim} /></button>
         </div>
       </div>
-      {page === "orders" && <OrdersPage data={data} setData={setData} user={user} log={log} />}
+      {page === "orders" && <OrdersPage data={data} setData={setData} user={user} log={log} loadFromDb={loadFromDb} />}
       {page === "finance" && <FinancesPage data={data} setData={setData} user={user} log={log} />}
       {page === "archive" && <ArchivePage data={data} setData={setData} user={user} log={log} />}
       {page === "inventory" && <InventoryPage data={data} setData={setData} user={user} log={log} />}
@@ -1670,7 +1818,7 @@ export default function App() {
       {page === "nabavka" && isA && <NabavkaPage data={data} goBack={() => setPage("more")} />}
       {!isDesktop && (
         <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: maxW, background: C.s1, borderTop: `1px solid ${C.border}`, display: "flex", zIndex: 100, paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
-          {navItems.map(n => <button key={n.id} onClick={() => setPage(n.id)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "9px 2px", fontSize: 10, fontWeight: activeP === n.id ? 700 : 500, color: activeP === n.id ? C.accent : C.dim, background: "none", border: "none", cursor: "pointer", fontFamily: F, position: "relative" }}>{activeP === n.id && <div style={{ position: "absolute", top: 0, left: "20%", right: "20%", height: 3, background: C.accent, borderRadius: "0 0 3px 3px" }} />}<Ic d={n.ic} size={19} color={activeP === n.id ? C.accent : C.dim} />{n.l}</button>)}
+          {navItems.map(n => <button key={n.id} onClick={() => setPage(n.id)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "9px 2px", fontSize: 12, fontWeight: activeP === n.id ? 700 : 500, color: activeP === n.id ? C.accent : C.dim, background: "none", border: "none", cursor: "pointer", fontFamily: F, position: "relative" }}>{activeP === n.id && <div style={{ position: "absolute", top: 0, left: "20%", right: "20%", height: 3, background: C.accent, borderRadius: "0 0 3px 3px" }} />}<Ic d={n.ic} size={19} color={activeP === n.id ? C.accent : C.dim} />{n.l}</button>)}
         </div>
       )}
     </div>
