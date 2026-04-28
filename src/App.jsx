@@ -1318,6 +1318,27 @@ function ProfitPage({ data, setData, log, goBack }) {
   const [tab, setTab] = useState("main");
   const [showCost, setShowCost] = useState(false); const [cm, setCm] = useState(""); const [cp, setCp] = useState("");
   const [showAd, setShowAd] = useState(false); const [ad, setAd] = useState(tdy()); const [aa, setAa] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Konfigurabilne cene troškova (per shipment)
+  const [workerCost, setWorkerCost] = useState(() => {
+    try { return parseFloat(localStorage.getItem("ecom-worker-cost")) || 180; } catch { return 180; }
+  });
+  const [transportCost, setTransportCost] = useState(() => {
+    try { return parseFloat(localStorage.getItem("ecom-transport-cost")) || 150; } catch { return 150; }
+  });
+  const saveSettings = (worker, transport) => {
+    try {
+      localStorage.setItem("ecom-worker-cost", String(worker));
+      localStorage.setItem("ecom-transport-cost", String(transport));
+    } catch {}
+    setWorkerCost(worker);
+    setTransportCost(transport);
+    setShowSettings(false);
+  };
+  const [settingsW, setSettingsW] = useState(workerCost);
+  const [settingsT, setSettingsT] = useState(transportCost);
+
   const addC = () => { if (!cm || !cp) return; const nd = { ...data }; nd.costs.push({ id: uid(), model: cm, price: parseFloat(cp) }); log(nd, `Cena: ${cm}=${fm(cp)}`); setData(nd); sv(nd); setShowCost(false); setCm(""); setCp(""); };
   const delC = c => { if (!confirm(`Obriši nabavnu cenu za ${c.model} (${fm(c.price)})?`)) return; const nd = { ...data, costs: data.costs.filter(x => x.id !== c.id) }; log(nd, `Obrisana nabavna cena: ${c.model}, ${fm(c.price)}`); setData(nd); sv(nd); };
   const addA = () => { if (!aa) return; const nd = { ...data }; nd.adSpend.push({ id: uid(), date: ad, amount: parseFloat(aa) }); log(nd, `Reklame ${ad}: ${fm(aa)}`); setData(nd); sv(nd); setShowAd(false); setAa(""); };
@@ -1349,26 +1370,34 @@ function ProfitPage({ data, setData, log, goBack }) {
   const daily = useMemo(() => {
     const d = {};
     data.orders.forEach(o => {
-      if (o.status === "odbijeno") return;
+      if (o.archived) return;
       const k = dk(o.dateCreated);
       if (monthKey(k) !== selectedMonth) return; // filter po mesecu
-      if (!d[k]) d[k] = { rev: 0, cost: 0, ads: 0, n: 0 };
-      d[k].rev += o.codAmount || 0;
-      d[k].cost += getCost(o.model);
+      if (!d[k]) d[k] = { rev: 0, cost: 0, ads: 0, workers: 0, transport: 0, n: 0 };
+      // Sve porudžbine kreirane tog dana (Za unos + ostalo) — broje se u radnici/prevoz
       d[k].n++;
+      d[k].workers += workerCost;
+      d[k].transport += transportCost;
+      // Otkup i nabavka — ne računaju se za odbijene
+      if (o.status !== "odbijeno") {
+        d[k].rev += o.codAmount || 0;
+        d[k].cost += getCost(o.model);
+      }
     });
     data.adSpend.forEach(a => {
       if (monthKey(a.date) !== selectedMonth) return;
       const k = a.date;
-      if (!d[k]) d[k] = { rev: 0, cost: 0, ads: 0, n: 0 };
+      if (!d[k]) d[k] = { rev: 0, cost: 0, ads: 0, workers: 0, transport: 0, n: 0 };
       d[k].ads += a.amount || 0;
     });
-    return Object.entries(d).sort((a, b) => b[0].localeCompare(a[0])).map(([date, v]) => ({ date, ...v, profit: v.rev - v.cost - v.ads }));
-  }, [data.orders, data.adSpend, data.costs, selectedMonth]);
+    return Object.entries(d).sort((a, b) => b[0].localeCompare(a[0])).map(([date, v]) => ({ date, ...v, profit: v.rev - v.cost - v.ads - v.workers - v.transport }));
+  }, [data.orders, data.adSpend, data.costs, selectedMonth, workerCost, transportCost]);
   const totP = daily.reduce((s, d) => s + d.profit, 0);
   const totR = daily.reduce((s, d) => s + d.rev, 0);
   const totC = daily.reduce((s, d) => s + d.cost, 0);
   const totA = daily.reduce((s, d) => s + d.ads, 0);
+  const totW = daily.reduce((s, d) => s + d.workers, 0);
+  const totT = daily.reduce((s, d) => s + d.transport, 0);
   const [pg, setPg] = useState(0);
   const pagedD = daily.slice(pg * PER_PAGE, (pg + 1) * PER_PAGE);
 
@@ -1409,12 +1438,49 @@ function ProfitPage({ data, setData, log, goBack }) {
       </div>
 
       <div style={{ ...S.stat, textAlign: "center", marginBottom: 14, borderRadius: 14, border: `1px solid ${totP > 0 ? C.success + "33" : C.danger + "33"}`, background: totP > 0 ? C.successBg : C.dangerBg, padding: 16 }}><div style={S.stL}>Profit za {formatMonth(selectedMonth)}</div><div style={{ ...S.stV, fontSize: 30, color: totP > 0 ? C.success : C.danger }}>{fm(totP)}</div></div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 14 }}><div style={S.stat}><div style={S.stL}>Otkup</div><div style={{ ...S.stV, fontSize: 16, color: C.info }}>{fm(totR)}</div></div><div style={S.stat}><div style={S.stL}>Nabavka</div><div style={{ ...S.stV, fontSize: 16, color: C.danger }}>{fm(totC)}</div></div><div style={S.stat}><div style={S.stL}>Reklame</div><div style={{ ...S.stV, fontSize: 16, color: "#fb923c" }}>{fm(totA)}</div></div></div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}><button onClick={() => setTab("costs")} style={{ ...S.btn2, flex: 1, fontSize: 15 }}>💰 Nabavne cene</button><button onClick={() => setTab("ads")} style={{ ...S.btn2, flex: 1, fontSize: 15, color: "#fb923c", borderColor: "#fb923c44" }}>📢 Reklame</button></div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
+        <div style={S.stat}><div style={S.stL}>Otkup</div><div style={{ ...S.stV, fontSize: 16, color: C.info }}>{fm(totR)}</div></div>
+        <div style={S.stat}><div style={S.stL}>Nabavka</div><div style={{ ...S.stV, fontSize: 16, color: C.danger }}>{fm(totC)}</div></div>
+        <div style={S.stat}><div style={S.stL}>Reklame</div><div style={{ ...S.stV, fontSize: 16, color: "#fb923c" }}>{fm(totA)}</div></div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
+        <div style={S.stat}><div style={S.stL}>👷 Radnici</div><div style={{ ...S.stV, fontSize: 16, color: "#a78bfa" }}>{fm(totW)}</div></div>
+        <div style={S.stat}><div style={S.stL}>🚚 Prevoz</div><div style={{ ...S.stV, fontSize: 16, color: "#06b6d4" }}>{fm(totT)}</div></div>
+      </div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+        <button onClick={() => setTab("costs")} style={{ ...S.btn2, flex: 1, fontSize: 15 }}>💰 Nabavne cene</button>
+        <button onClick={() => setTab("ads")} style={{ ...S.btn2, flex: 1, fontSize: 15, color: "#fb923c", borderColor: "#fb923c44" }}>📢 Reklame</button>
+        <button onClick={() => { setSettingsW(workerCost); setSettingsT(transportCost); setShowSettings(true); }} style={{ ...S.btn2, padding: "10px 14px", fontSize: 15, color: C.dim }}>⚙️</button>
+      </div>
       <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>📊 Dnevni pregled</div>
-      {pagedD.map(d => <div key={d.date} style={S.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}><div style={{ fontWeight: 700, fontSize: 16 }}>{fd(d.date + "T00:00:00")}</div><div style={{ fontWeight: 800, fontFamily: FM, fontSize: 17, color: d.profit > 0 ? C.success : C.danger }}>{fm(d.profit)}</div></div><div style={{ display: "flex", gap: 12, fontSize: 14, color: C.dim, flexWrap: "wrap" }}><span>Otkup: {fm(d.rev)}</span><span>Nabavka: {fm(d.cost)}</span>{d.ads > 0 && <span>Reklame: {fm(d.ads)}</span>}<span>{d.n} nar.</span></div></div>)}
+      {pagedD.map(d => <div key={d.date} style={S.card}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+          <div style={{ fontWeight: 700, fontSize: 16 }}>{fd(d.date + "T00:00:00")}</div>
+          <div style={{ fontWeight: 800, fontFamily: FM, fontSize: 17, color: d.profit > 0 ? C.success : C.danger }}>{fm(d.profit)}</div>
+        </div>
+        <div style={{ display: "flex", gap: 12, fontSize: 14, color: C.dim, flexWrap: "wrap" }}>
+          <span>Otkup: {fm(d.rev)}</span>
+          <span>Nabavka: {fm(d.cost)}</span>
+          {d.ads > 0 && <span>Reklame: {fm(d.ads)}</span>}
+          <span>👷 {fm(d.workers)}</span>
+          <span>🚚 {fm(d.transport)}</span>
+          <span>{d.n} {d.n === 1 ? "porudž." : "porudž."}</span>
+        </div>
+      </div>)}
       <Pager page={pg} total={daily.length} setPage={setPg} />
       {showAd && <Modal title="📢 Reklame" onClose={() => setShowAd(false)}><Fl label="Datum"><input style={S.inp} type="date" value={ad} onChange={e => setAd(e.target.value)} /></Fl><Fl label="Iznos *"><input style={S.inp} type="number" value={aa} onChange={e => setAa(e.target.value)} placeholder="5000" /></Fl><button onClick={addA} style={{ ...S.btn, width: "100%", marginTop: 6, padding: "13px", fontSize: 17 }}>Sačuvaj</button></Modal>}
+      {showSettings && <Modal title="⚙️ Cene troškova" onClose={() => setShowSettings(false)}>
+        <div style={{ fontSize: 13, color: C.dim, marginBottom: 14, lineHeight: 1.5 }}>
+          Po porudžbini se automatski računa trošak radnika i prevoza. Unesi cene koje važe danas — može se promeniti bilo kada.
+        </div>
+        <Fl label="👷 Trošak radnika po porudžbini (RSD)">
+          <input style={S.inp} type="number" value={settingsW} onChange={e => setSettingsW(parseFloat(e.target.value) || 0)} placeholder="180" />
+        </Fl>
+        <Fl label="🚚 Trošak prevoza po porudžbini (RSD)">
+          <input style={S.inp} type="number" value={settingsT} onChange={e => setSettingsT(parseFloat(e.target.value) || 0)} placeholder="150" />
+        </Fl>
+        <button onClick={() => saveSettings(settingsW, settingsT)} style={{ ...S.btn, width: "100%", padding: "13px", fontSize: 17, marginTop: 6 }}>Sačuvaj</button>
+      </Modal>}
     </div>
   );
 }
