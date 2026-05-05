@@ -1718,6 +1718,8 @@ export default function App() {
   const dataRef = useRef(data);
   const lastSyncedRef = useRef(blank()); // what's actually in DB (source of truth for prev)
   const skipSyncRef = useRef(false);
+  const pendingWritesRef = useRef(0); // counter of in-flight DB writes
+  const reloadQueuedRef = useRef(false); // if reload was attempted while writes were pending
   useEffect(() => { dataRef.current = data; }, [data]);
 
   // Smart setData that auto-syncs changes to DB (per-entity diff)
@@ -1726,23 +1728,44 @@ export default function App() {
     dataRef.current = next;
     setDataRaw(next);
     if (!skipSyncRef.current) {
-      // Use lastSyncedRef as "prev" - this is what DB currently has
       const prev = lastSyncedRef.current;
       console.log("[setData] syncing (orders:", prev.orders?.length || 0, "→", next.orders?.length || 0, ")");
-      // Update lastSyncedRef BEFORE syncDiff with deep clone so subsequent calls see the current state
+      // Update lastSyncedRef BEFORE syncDiff so subsequent setData calls have correct baseline
       lastSyncedRef.current = JSON.parse(JSON.stringify(next));
-      syncDiff(prev, next).catch(e => console.error("syncDiff error:", e));
+      pendingWritesRef.current++;
+      syncDiff(prev, next)
+        .catch(e => console.error("syncDiff error:", e))
+        .finally(() => {
+          pendingWritesRef.current = Math.max(0, pendingWritesRef.current - 1);
+          // If reload was requested while writes were in-flight, run it now
+          if (pendingWritesRef.current === 0 && reloadQueuedRef.current) {
+            reloadQueuedRef.current = false;
+            setTimeout(() => loadFromDbInternal(), 100);
+          }
+        });
     } else {
       // Remote update — still update lastSynced to match
       lastSyncedRef.current = JSON.parse(JSON.stringify(next));
     }
   }, []);
 
-  // Load data WITHOUT triggering sync
-  const loadFromDb = useCallback(async () => {
+  // Internal load — used by all reload paths. Skips if writes are pending.
+  const loadFromDbInternal = useCallback(async () => {
+    if (pendingWritesRef.current > 0) {
+      // Writes in-flight — defer reload until they complete
+      reloadQueuedRef.current = true;
+      console.log("[loadFromDb] deferred — writes pending");
+      return;
+    }
     skipSyncRef.current = true;
     try {
       const d = await ld();
+      // Race-check: if writes started while we were fetching, abort overwriting local state
+      if (pendingWritesRef.current > 0) {
+        reloadQueuedRef.current = true;
+        console.log("[loadFromDb] aborted — writes started during fetch");
+        return;
+      }
       dataRef.current = d;
       lastSyncedRef.current = JSON.parse(JSON.stringify(d));
       setDataRaw(d);
@@ -1750,6 +1773,9 @@ export default function App() {
       skipSyncRef.current = false;
     }
   }, []);
+
+  // Public API
+  const loadFromDb = loadFromDbInternal;
   const ww = useWW();
   const isDesktop = ww >= 900;
   useEffect(() => { loadFromDb().then(() => setLoading(false)); }, []);
@@ -1777,21 +1803,15 @@ export default function App() {
     return () => { if (reloadTimer) clearTimeout(reloadTimer); supabase.removeChannel(ch); };
   }, [user]);
 
-  // Fallback polling when Supabase not used
+  // Fallback polling SAMO kad nema Supabase Realtime (offline / localStorage mod)
   useEffect(() => {
     if (!user || supabase) return;
-    const iv = setInterval(() => { loadFromDb(); }, 5000);
+    const iv = setInterval(() => { loadFromDb(); }, 10000);
     return () => clearInterval(iv);
   }, [user]);
 
-  // Brzo osvezavanje svakih 5 sekundi (u slucaju da Realtime nije dostupan ili cache problema)
-  useEffect(() => {
-    if (!user || !supabase) return;
-    const iv = setInterval(() => { loadFromDb(); }, 5000);
-    return () => clearInterval(iv);
-  }, [user]);
-
-  // Refresh na promenu tab-a
+  // Refresh na promenu glavne stranice (Porudžbine → Finansije → Popis...)
+  // Realtime će već sinhronizovati kad neko drugi nešto promeni; ovo je samo dodatni safety.
   useEffect(() => {
     if (!user) return;
     loadFromDb().catch(() => {});
@@ -1876,10 +1896,10 @@ export default function App() {
       {page === "archive" && <ArchivePage data={data} setData={setData} user={user} log={log} />}
       {page === "inventory" && <InventoryPage data={data} setData={setData} user={user} log={log} />}
       {page === "more" && <MorePage setPage={setPage} user={user} data={data} />}
-      {page === "models" && <ModelsPage data={data} setData={setData} log={log} goBack={() => setPage("more")} />}
-      {page === "profit" && <ProfitPage data={data} setData={setData} log={log} goBack={() => setPage("more")} />}
-      {page === "history" && <HistoryPage data={data} goBack={() => setPage("more")} />}
-      {page === "export" && <ExportPage data={data} goBack={() => setPage("more")} />}
+      {page === "models" && isA && <ModelsPage data={data} setData={setData} log={log} goBack={() => setPage("more")} />}
+      {page === "profit" && isA && <ProfitPage data={data} setData={setData} log={log} goBack={() => setPage("more")} />}
+      {page === "history" && isA && <HistoryPage data={data} goBack={() => setPage("more")} />}
+      {page === "export" && isA && <ExportPage data={data} goBack={() => setPage("more")} />}
       {page === "urgentno" && isA && <UrgentnoPage data={data} setData={setData} user={user} log={log} goBack={() => setPage("more")} />}
       {page === "nabavka" && isA && <NabavkaPage data={data} goBack={() => setPage("more")} />}
       {!isDesktop && (
