@@ -466,7 +466,7 @@ function OrdersPage({ data, setData, user, log, loadFromDb }) {
     log(nd, `Obrisano: ${o.name}`); setData(nd); sv(nd);
   };
 
-  // Štampa nalepnica za sve "Po Nedji" porudžbine — 80 nalepnica/A4 (35.4×16.9mm)
+  // Štampa nalepnica za sve "Po Nedji" porudžbine — 40 nalepnica/A4 (48.5×25.4mm)
   // 1 nalepnica = 1 par patika (ako kupac uzima 2 para → 2 nalepnice)
   const printLabels = () => {
     const nedjaOrders = data.orders.filter(o => o.status === "poslato_nedja" && !o.archived);
@@ -485,11 +485,11 @@ function OrdersPage({ data, setData, user, log, loadFromDb }) {
     }
     if (labels.length === 0) { alert("Nema modela za štampu"); return; }
 
-    // HTML za novu stranicu — 80 nalepnica po A4
-    // Layout: 5 kolona × 16 redova = 80 nalepnica
-    // Dimenzije: 35.4mm × 16.9mm svaka
+    // HTML za novu stranicu — 40 nalepnica po A4
+    // Layout: 4 kolone × 10 redova = 40 nalepnica
+    // Dimenzije: 48.5mm × 25.4mm svaka (Avery L7654 / J8654)
     const labelsHtml = labels.map(text => `<div class="label">${text}</div>`).join("");
-    const totalPages = Math.ceil(labels.length / 80);
+    const totalPages = Math.ceil(labels.length / 40);
 
     const html = `<!DOCTYPE html>
 <html>
@@ -499,32 +499,33 @@ function OrdersPage({ data, setData, user, log, loadFromDb }) {
 <style>
   @page {
     size: A4;
-    margin: 13.5mm 7mm 13.5mm 7mm;
+    margin: 13.5mm 8mm 13.5mm 8mm;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; }
   .sheet {
     display: grid;
-    grid-template-columns: repeat(5, 35.4mm);
-    grid-template-rows: repeat(16, 16.9mm);
-    gap: 0;
-    column-gap: 2.5mm;
-    width: 196mm;
+    grid-template-columns: repeat(4, 48.5mm);
+    grid-template-rows: repeat(10, 25.4mm);
+    column-gap: 0;
+    row-gap: 0;
+    width: 194mm;
   }
   .label {
-    width: 35.4mm;
-    height: 16.9mm;
+    width: 48.5mm;
+    height: 25.4mm;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11pt;
+    font-size: 15pt;
     font-weight: 800;
     text-align: center;
     color: #000;
     overflow: hidden;
-    line-height: 1.1;
-    padding: 1mm;
+    line-height: 1.15;
+    padding: 1.5mm;
     border: 1px dashed transparent;
+    word-break: break-word;
   }
   .label.preview { border: 1px dashed #ccc; }
   .toolbar {
@@ -554,11 +555,11 @@ function OrdersPage({ data, setData, user, log, loadFromDb }) {
 </head>
 <body>
   <div class="toolbar">
-    <div class="info">📄 ${labels.length} nalepnica na ${totalPages} ${totalPages === 1 ? "stranici" : "stranica"} • Format: 35.4×16.9mm (Avery L7651) • Dvodimenzioni A4 papir</div>
+    <div class="info">📄 ${labels.length} nalepnica na ${totalPages} ${totalPages === 1 ? "stranici" : "stranica"} • Format: 48.5×25.4mm (Avery L7654) • A4 samolepivi papir</div>
     <button onclick="window.print()">🖨️ Štampaj</button>
     <button onclick="document.querySelectorAll('.label').forEach(l => l.classList.toggle('preview'))">👁️ Granice</button>
   </div>
-  <div style="padding: 13.5mm 7mm;">
+  <div style="padding: 13.5mm 8mm;">
     <div class="sheet">${labelsHtml}</div>
   </div>
 </body>
