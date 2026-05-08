@@ -1370,7 +1370,8 @@ function ProfitPage({ data, setData, log, goBack }) {
   const daily = useMemo(() => {
     const d = {};
     data.orders.forEach(o => {
-      if (o.archived) return;
+      // VAŽNO: arhivirane porudžbine se i dalje računaju u statistike (profit, troškovi, otkup)
+      // Arhiviranje je samo "skloni mi to s glavne liste" — finansijski podaci moraju ostati
       const k = dk(o.dateCreated);
       if (monthKey(k) !== selectedMonth) return; // filter po mesecu
       if (!d[k]) d[k] = { rev: 0, cost: 0, ads: 0, workers: 0, transport: 0, n: 0 };
