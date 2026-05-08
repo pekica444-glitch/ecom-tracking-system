@@ -466,6 +466,110 @@ function OrdersPage({ data, setData, user, log, loadFromDb }) {
     log(nd, `Obrisano: ${o.name}`); setData(nd); sv(nd);
   };
 
+  // Štampa nalepnica za sve "Po Nedji" porudžbine — 80 nalepnica/A4 (35.4×16.9mm)
+  // 1 nalepnica = 1 par patika (ako kupac uzima 2 para → 2 nalepnice)
+  const printLabels = () => {
+    const nedjaOrders = data.orders.filter(o => o.status === "poslato_nedja" && !o.archived);
+    if (nedjaOrders.length === 0) { alert("Nema porudžbina sa statusom Po Nedji"); return; }
+
+    // Skupljanje svih parova patika
+    const labels = [];
+    for (const o of nedjaOrders) {
+      const items = (Array.isArray(o.models) && o.models.length) ? o.models : [{ name: o.model || "", size: "" }];
+      for (const m of items) {
+        const name = (m.name || "").trim();
+        const size = String(m.size || "").trim();
+        if (!name) continue;
+        labels.push(`${name.toUpperCase()} ${size}`.trim());
+      }
+    }
+    if (labels.length === 0) { alert("Nema modela za štampu"); return; }
+
+    // HTML za novu stranicu — 80 nalepnica po A4
+    // Layout: 5 kolona × 16 redova = 80 nalepnica
+    // Dimenzije: 35.4mm × 16.9mm svaka
+    const labelsHtml = labels.map(text => `<div class="label">${text}</div>`).join("");
+    const totalPages = Math.ceil(labels.length / 80);
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Nalepnice — ${labels.length} parova (${totalPages} ${totalPages === 1 ? "stranica" : "stranica"})</title>
+<style>
+  @page {
+    size: A4;
+    margin: 13.5mm 7mm 13.5mm 7mm;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; }
+  .sheet {
+    display: grid;
+    grid-template-columns: repeat(5, 35.4mm);
+    grid-template-rows: repeat(16, 16.9mm);
+    gap: 0;
+    column-gap: 2.5mm;
+    width: 196mm;
+  }
+  .label {
+    width: 35.4mm;
+    height: 16.9mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11pt;
+    font-weight: 800;
+    text-align: center;
+    color: #000;
+    overflow: hidden;
+    line-height: 1.1;
+    padding: 1mm;
+    border: 1px dashed transparent;
+  }
+  .label.preview { border: 1px dashed #ccc; }
+  .toolbar {
+    padding: 14px;
+    background: #f1f5f9;
+    border-bottom: 1px solid #cbd5e1;
+    text-align: center;
+    font-family: Arial, sans-serif;
+  }
+  .toolbar button {
+    padding: 10px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    background: #f59e0b;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    margin: 0 4px;
+  }
+  .toolbar .info { color: #475569; font-size: 13px; margin-bottom: 8px; }
+  @media print {
+    .toolbar { display: none; }
+    .label { border: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="info">📄 ${labels.length} nalepnica na ${totalPages} ${totalPages === 1 ? "stranici" : "stranica"} • Format: 35.4×16.9mm (Avery L7651) • Dvodimenzioni A4 papir</div>
+    <button onclick="window.print()">🖨️ Štampaj</button>
+    <button onclick="document.querySelectorAll('.label').forEach(l => l.classList.toggle('preview'))">👁️ Granice</button>
+  </div>
+  <div style="padding: 13.5mm 7mm;">
+    <div class="sheet">${labelsHtml}</div>
+  </div>
+</body>
+</html>`;
+
+    const w = window.open("", "_blank");
+    if (!w) { alert("Browser je blokirao novi tab. Dozvoli pop-ups za ovaj sajt."); return; }
+    w.document.write(html);
+    w.document.close();
+  };
+
   // UNDO
   const wrapAction = (act, fn) => {
     if (user.role === "worker") {
@@ -605,9 +709,14 @@ function OrdersPage({ data, setData, user, log, loadFromDb }) {
       </div>
 
       {isA && (
-        <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-          <button onClick={() => { setForm(ef); setPaste(""); setShowNew(true); }} style={{ ...S.btn, flex: 1, padding: "10px" }}><Ic d={I.plus} size={16} color="#000" /> Nova</button>
-          {unetoOrders.length > 0 && <button onClick={() => { setBulkNedja(true); setBulkSel([]); }} style={{ ...S.btn2, flex: 1, padding: "10px", color: "#fb923c", borderColor: "#fb923c44" }}>🚐 Nedja ({unetoOrders.length})</button>}
+        <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
+          <button onClick={() => { setForm(ef); setPaste(""); setShowNew(true); }} style={{ ...S.btn, flex: "1 1 calc(50% - 4px)", padding: "10px" }}><Ic d={I.plus} size={16} color="#000" /> Nova</button>
+          {unetoOrders.length > 0 && <button onClick={() => { setBulkNedja(true); setBulkSel([]); }} style={{ ...S.btn2, flex: "1 1 calc(50% - 4px)", padding: "10px", color: "#fb923c", borderColor: "#fb923c44" }}>🚐 Nedja ({unetoOrders.length})</button>}
+          {(() => {
+            const nedjaCount = data.orders.filter(o => o.status === "poslato_nedja" && !o.archived).length;
+            if (nedjaCount === 0) return null;
+            return <button onClick={() => printLabels()} style={{ ...S.btn2, flex: "1 1 100%", padding: "10px", color: "#3b82f6", borderColor: "#3b82f644" }}>🏷️ Štampaj nalepnice za Po Nedji ({nedjaCount})</button>;
+          })()}
         </div>
       )}
 
@@ -1003,6 +1112,13 @@ function InventoryPage({ data, setData, user, log }) {
 // MORE / MODELS / HISTORY / PROFIT / EXPORT
 // ═══════════════════════════════════════════════════════════════
 function NabavkaPage({ data, goBack }) {
+  // Modeli koji idu kod istog dobavljača (Dobavljač A: Dragon + La Polo)
+  const SUPPLIER_A = ["dragon", "la polo", "lapolo"];
+  const isSupplierA = (modelName) => {
+    const m = (modelName || "").toLowerCase().trim();
+    return SUPPLIER_A.some(s => m.includes(s));
+  };
+
   // Generiši spisak: svi modeli+brojevi iz porudžbina sa statusom "novo" (Za unos),
   // preskačući one koji već postoje u popisu, sortirani od najstarije porudžbine
   const spisak = useMemo(() => {
@@ -1018,9 +1134,9 @@ function NabavkaPage({ data, goBack }) {
       .filter(o => !o.archived && (o.status === "novo" || o.status === "uneto") && !o.fromInventory)
       .sort((a, b) => new Date(a.dateCreated || 0) - new Date(b.dateCreated || 0));
 
-    // Grupisano po modelu, redosled dodavanja sačuvan
-    const grouped = {}; // { "DRAGON": ["44", "45", "44", ...] }
-    const order = []; // redosled pojavljivanja modela
+    // Dva zasebna sekcije: A (Dragon + La Polo) i Ostali
+    const groupedA = {}, orderA = [];
+    const groupedOther = {}, orderOther = [];
 
     for (const o of zaUnos) {
       const items = (o.models && o.models.length) ? o.models : [{ name: o.model, size: "" }];
@@ -1035,19 +1151,42 @@ function NabavkaPage({ data, goBack }) {
           continue;
         }
         const key = modelName.toUpperCase();
-        if (!grouped[key]) { grouped[key] = []; order.push(key); }
-        grouped[key].push(size);
+        if (isSupplierA(modelName)) {
+          if (!groupedA[key]) { groupedA[key] = []; orderA.push(key); }
+          groupedA[key].push(size);
+        } else {
+          if (!groupedOther[key]) { groupedOther[key] = []; orderOther.push(key); }
+          groupedOther[key].push(size);
+        }
       }
     }
-    return { grouped, order, total: order.reduce((s, k) => s + grouped[k].length, 0), dateStr: fd(new Date().toISOString()) };
+    const totalA = orderA.reduce((s, k) => s + groupedA[k].length, 0);
+    const totalOther = orderOther.reduce((s, k) => s + groupedOther[k].length, 0);
+    return {
+      groupedA, orderA, totalA,
+      groupedOther, orderOther, totalOther,
+      total: totalA + totalOther,
+      dateStr: fd(new Date().toISOString())
+    };
   }, [data.orders, data.inventory]);
 
   const textVersion = useMemo(() => {
     const lines = [`🛍️ NABAVKA — ${spisak.dateStr}`, ""];
-    for (const model of spisak.order) {
-      lines.push(`${model}  ${spisak.grouped[model].join(" ")}`);
+    if (spisak.totalA > 0) {
+      lines.push("━━━ DOBAVLJAČ A (Dragon, La Polo) ━━━");
+      for (const model of spisak.orderA) {
+        lines.push(`${model}  ${spisak.groupedA[model].join(" ")}`);
+      }
+      lines.push(`Ukupno: ${spisak.totalA} pari`, "");
     }
-    lines.push("", `Ukupno: ${spisak.total} pari`);
+    if (spisak.totalOther > 0) {
+      lines.push("━━━ OSTALI ━━━");
+      for (const model of spisak.orderOther) {
+        lines.push(`${model}  ${spisak.groupedOther[model].join(" ")}`);
+      }
+      lines.push(`Ukupno: ${spisak.totalOther} pari`, "");
+    }
+    lines.push(`UKUPNO ZA NABAVKU: ${spisak.total} pari`);
     return lines.join("\n");
   }, [spisak]);
 
@@ -1056,15 +1195,41 @@ function NabavkaPage({ data, goBack }) {
     else alert("⚠️ Nije moguće kopirati");
   };
 
+  // Funkcija koja kopira samo deo za jednog dobavljača
+  const copySupplier = (which) => {
+    const lines = [];
+    if (which === "A") {
+      lines.push(`🛍️ NABAVKA — ${spisak.dateStr}`, "Dragon + La Polo", "");
+      for (const model of spisak.orderA) {
+        lines.push(`${model}  ${spisak.groupedA[model].join(" ")}`);
+      }
+      lines.push("", `Ukupno: ${spisak.totalA} pari`);
+    } else {
+      lines.push(`🛍️ NABAVKA — ${spisak.dateStr}`, "Ostali modeli", "");
+      for (const model of spisak.orderOther) {
+        lines.push(`${model}  ${spisak.groupedOther[model].join(" ")}`);
+      }
+      lines.push("", `Ukupno: ${spisak.totalOther} pari`);
+    }
+    if (copyText(lines.join("\n"))) alert(`✅ ${which === "A" ? "Dobavljač A" : "Ostali"} kopiran u clipboard`);
+    else alert("⚠️ Nije moguće kopirati");
+  };
+
   const downloadJPG = () => {
-    // Render u canvas pa izvezi kao JPG
     const padding = 40;
     const lineHeight = 44;
+    const sectionHeaderHeight = 60;
+    const sectionFooterHeight = 30;
     const modelWidth = 260;
     const width = 900;
     const headerHeight = 90;
     const footerHeight = 70;
-    const contentHeight = spisak.order.length * lineHeight;
+
+    // Calculate content height
+    let contentHeight = 0;
+    if (spisak.totalA > 0) contentHeight += sectionHeaderHeight + (spisak.orderA.length * lineHeight) + sectionFooterHeight;
+    if (spisak.totalOther > 0) contentHeight += sectionHeaderHeight + (spisak.orderOther.length * lineHeight) + sectionFooterHeight;
+
     const height = headerHeight + contentHeight + footerHeight + padding * 2;
 
     const canvas = document.createElement("canvas");
@@ -1072,16 +1237,13 @@ function NabavkaPage({ data, goBack }) {
     canvas.height = height;
     const ctx = canvas.getContext("2d");
 
-    // Pozadina
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, width, height);
 
-    // Naslov
     ctx.fillStyle = "#0a0a0d";
     ctx.font = "bold 36px Arial, sans-serif";
     ctx.fillText(`🛍️ NABAVKA — ${spisak.dateStr}`, padding, padding + 40);
 
-    // Linija ispod naslova
     ctx.strokeStyle = "#f59e0b";
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -1089,29 +1251,53 @@ function NabavkaPage({ data, goBack }) {
     ctx.lineTo(width - padding, padding + 60);
     ctx.stroke();
 
-    // Modeli
     let y = padding + headerHeight + 20;
-    ctx.font = "bold 28px Arial, sans-serif";
-    for (const model of spisak.order) {
-      ctx.fillStyle = "#0a0a0d";
-      ctx.fillText(model, padding, y);
-      ctx.fillStyle = "#f59e0b";
-      ctx.font = "bold 30px 'Courier New', monospace";
-      const sizes = spisak.grouped[model].join("  ");
-      ctx.fillText(sizes, padding + modelWidth, y);
-      ctx.font = "bold 28px Arial, sans-serif";
-      y += lineHeight;
+
+    const renderSection = (title, modelOrder, modelMap, total, color) => {
+      // Section header
+      ctx.fillStyle = color;
+      ctx.font = "bold 22px Arial, sans-serif";
+      ctx.fillText(title, padding, y);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(padding, y + 8);
+      ctx.lineTo(width - padding, y + 8);
+      ctx.stroke();
+      y += sectionHeaderHeight;
+
+      // Modeli
+      for (const model of modelOrder) {
+        ctx.fillStyle = "#0a0a0d";
+        ctx.font = "bold 28px Arial, sans-serif";
+        ctx.fillText(model, padding, y);
+        ctx.fillStyle = color;
+        ctx.font = "bold 30px 'Courier New', monospace";
+        ctx.fillText(modelMap[model].join("  "), padding + modelWidth, y);
+        y += lineHeight;
+      }
+
+      // Section subtotal
+      ctx.fillStyle = "#64748b";
+      ctx.font = "italic 18px Arial, sans-serif";
+      ctx.fillText(`Subtotal: ${total} pari`, padding, y + 5);
+      y += sectionFooterHeight;
+    };
+
+    if (spisak.totalA > 0) {
+      renderSection("━━━ DOBAVLJAČ A (Dragon, La Polo) ━━━", spisak.orderA, spisak.groupedA, spisak.totalA, "#3b82f6");
+    }
+    if (spisak.totalOther > 0) {
+      renderSection("━━━ OSTALI MODELI ━━━", spisak.orderOther, spisak.groupedOther, spisak.totalOther, "#f59e0b");
     }
 
-    // Footer
-    ctx.fillStyle = "#64748b";
-    ctx.font = "20px Arial, sans-serif";
-    ctx.fillText(`Ukupno: ${spisak.total} pari`, padding, height - padding - 20);
+    ctx.fillStyle = "#0a0a0d";
+    ctx.font = "bold 24px Arial, sans-serif";
+    ctx.fillText(`UKUPNO: ${spisak.total} pari`, padding, height - padding - 20);
     ctx.font = "14px Arial, sans-serif";
     ctx.fillStyle = "#94a3b8";
     ctx.fillText(`Generisano: ${new Date().toLocaleString("sr-RS")}`, padding, height - padding);
 
-    // Download
     canvas.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
@@ -1140,22 +1326,44 @@ function NabavkaPage({ data, goBack }) {
         </div>
       ) : (
         <>
-          <div style={{ ...S.card, padding: 18, marginBottom: 14, fontFamily: FM, fontSize: 16, lineHeight: 1.9 }}>
-            <div style={{ fontWeight: 700, fontSize: 15, color: C.dim, marginBottom: 10, fontFamily: F }}>📋 Pregled — sortirano od najstarije porudžbine</div>
-            {spisak.order.map(model => (
-              <div key={model} style={{ display: "flex", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
-                <span style={{ fontWeight: 800, minWidth: 130 }}>{model}</span>
-                <span style={{ color: C.accent, fontWeight: 700, letterSpacing: 2 }}>{spisak.grouped[model].join("  ")}</span>
+          {spisak.totalA > 0 && (
+            <div style={{ ...S.card, padding: 18, marginBottom: 12, fontFamily: FM, fontSize: 16, lineHeight: 1.9, borderLeft: `4px solid #3b82f6` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <div style={{ fontWeight: 800, fontSize: 15, color: "#3b82f6", fontFamily: F }}>🏭 DOBAVLJAČ A — Dragon, La Polo</div>
+                <button onClick={() => copySupplier("A")} style={{ ...S.btn2, padding: "5px 10px", fontSize: 13, color: "#3b82f6", borderColor: "#3b82f644" }}>📋 Kopiraj</button>
               </div>
-            ))}
-          </div>
+              {spisak.orderA.map(model => (
+                <div key={model} style={{ display: "flex", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
+                  <span style={{ fontWeight: 800, minWidth: 130 }}>{model}</span>
+                  <span style={{ color: "#3b82f6", fontWeight: 700, letterSpacing: 2 }}>{spisak.groupedA[model].join("  ")}</span>
+                </div>
+              ))}
+              <div style={{ marginTop: 8, fontSize: 13, color: C.dim, fontFamily: F, fontStyle: "italic" }}>Subtotal: {spisak.totalA} pari</div>
+            </div>
+          )}
+
+          {spisak.totalOther > 0 && (
+            <div style={{ ...S.card, padding: 18, marginBottom: 12, fontFamily: FM, fontSize: 16, lineHeight: 1.9, borderLeft: `4px solid ${C.accent}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <div style={{ fontWeight: 800, fontSize: 15, color: C.accent, fontFamily: F }}>🏪 OSTALI MODELI</div>
+                <button onClick={() => copySupplier("OTHER")} style={{ ...S.btn2, padding: "5px 10px", fontSize: 13, color: C.accent, borderColor: C.accent + "44" }}>📋 Kopiraj</button>
+              </div>
+              {spisak.orderOther.map(model => (
+                <div key={model} style={{ display: "flex", gap: 12, marginBottom: 4, flexWrap: "wrap" }}>
+                  <span style={{ fontWeight: 800, minWidth: 130 }}>{model}</span>
+                  <span style={{ color: C.accent, fontWeight: 700, letterSpacing: 2 }}>{spisak.groupedOther[model].join("  ")}</span>
+                </div>
+              ))}
+              <div style={{ marginTop: 8, fontSize: 13, color: C.dim, fontFamily: F, fontStyle: "italic" }}>Subtotal: {spisak.totalOther} pari</div>
+            </div>
+          )}
 
           <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
             <button onClick={downloadJPG} style={{ ...S.btn, flex: 1, padding: "13px", fontSize: 16 }}>🖼️ Preuzmi JPG</button>
-            <button onClick={copyList} style={{ ...S.btn2, flex: 1, padding: "13px", fontSize: 16 }}>📋 Kopiraj tekst</button>
+            <button onClick={copyList} style={{ ...S.btn2, flex: 1, padding: "13px", fontSize: 16 }}>📋 Kopiraj sve</button>
           </div>
           <div style={{ fontSize: 13, color: C.dim, textAlign: "center", lineHeight: 1.5 }}>
-            💡 Tip: "Kopiraj tekst" je zgodan za slanje preko Viber-a ili SMS-a
+            💡 Klikni 📋 pored sekcije da kopiraš samo tog dobavljača
           </div>
         </>
       )}
